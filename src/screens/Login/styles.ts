@@ -10,13 +10,39 @@ export const styles = StyleSheet.create({
   mt10: {
     marginTop: 10
   },
+  mb0: {
+    marginBottom: 0
+  },
+  mb10: {
+    marginBottom: 10
+  },
+  ml5: {
+    marginLeft: 5
+  },
+  pl15: {
+    paddingLeft: 15
+  },
   textAlignCenter: {
     textAlign: 'center'
   },
   body: {
     flex: 1,
-    backgroundColor: '#000',
-    justifyContent: 'flex-end'
+    backgroundColor: '#111111',
+    justifyContent: 'space-between',
+  },
+  containerLogo: {
+    height: '40%',
+    justifyContent: 'center',
+    alignItems: 'center'
+  },
+  logo: {
+    zIndex: 2,
+    width: 130,
+    height: 130,
+    borderRadius: 100,
+  },
+  bgContainer: {
+    position: 'absolute'
   },
   container: {
     padding: 25,
@@ -43,7 +69,6 @@ export const styles = StyleSheet.create({
     marginTop: 5,
     marginBottom: 10,
     alignItems: 'center',
-    justifyContent: 'space-between',
     flexDirection: 'row'
   },
   labelInput: {
@@ -56,7 +81,8 @@ export const styles = StyleSheet.create({
   input: {
     color: '#000',
     width: '80%',
-    paddingLeft: 10
+    paddingLeft: 10,
+    fontSize: 20
   },
   button: {
     backgroundColor: '#1C2120',
@@ -76,4 +102,15 @@ export const styles = StyleSheet.create({
     color: '#8F8E8E',
     letterSpacing: 1
   },
+  errorInput: {
+    borderWidth: 2,
+    borderColor: 'red'
+  },
+  errorText: {
+    marginLeft: 10,
+    color: 'red'
+  },
+  errorTextCnpj: {
+    marginBottom: 10
+  }
 });
