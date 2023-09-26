@@ -1,129 +1,105 @@
 import { Text, TextInput, TouchableOpacity, View, Alert } from "react-native";
 import { styles } from "./styles";
-import { Buildings, Eye, EyeClosed, Key } from 'phosphor-react-native';
+import { EnvelopeSimple, Eye, EyeClosed, LockKey } from 'phosphor-react-native';
+import { useNavigation } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import React, { useEffect, useState } from "react";
 import Logo from '../../../assets/images/logo.svg';
 
 export function Login() {
-  const [cnpj, setCnpj] = useState<string>('');
+  const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
   const [showPassword, setShowPassword] = useState(false);
-  const [cnpjError, setCnpjError] = useState<string>('');
-  const [passwordError, setPasswordError] = useState<string>('');
-
-  const formatCnpj = (inputValue: string): string => {
-      const numericValue: string = inputValue.replace(/\D/g, '');
-      const cnpjMasked = numericValue.replace(
-          /^(\d{0,2})(\d{0,3})(\d{0,3})(\d{0,4})(\d{0,2}).*/,
-          (match, p1, p2, p3, p4, p5) => {
-              let masked = '';
-              if (p1) masked += p1;
-              if (p2) masked += `.${p2}`;
-              if (p3) masked += `.${p3}`;
-              if (p4) masked += `/${p4}`;
-              if (p5) masked += `-${p5}`;
-              return masked;
-          }
-      );
-      return cnpjMasked;
-  };
+  const [error, setError] = useState<string>('');
 
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
   };
 
   const handleLoginPress = () => {
-    const cnpjValid = validateCnpj(cnpj);
+    const emailValid = validateEmail(email);
     const passwordValid = validatePassword(password);
 
-    if (cnpjValid && passwordValid) {
+    if (emailValid && passwordValid) {
       Alert.alert('Success');
+    } else {
+      setError('E-mail ou senha incorretos!');
     }
   };
 
-  const validateCnpj = (value: string): boolean => {
-    const trimmedCnpj = cnpj.trim();
-    if (!trimmedCnpj) {
-      setCnpjError('CNPJ é obrigatório!');
+  const validateEmail = (value: string): boolean => {
+    const trimmedEmail = email.trim();
+    if (!trimmedEmail) {
+      setError('');
       return false;
     }
 
-    if (trimmedCnpj.length !== 18) {
-      setCnpjError('CNPJ inválido!');
+    const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
+
+    if (!emailRegex.test(trimmedEmail)) {
+      setError('');
       return false;
     }
 
-    setCnpjError('');
+    setError('');
     return true;
   };
 
   const validatePassword = (value: string): boolean => {
     const trimmedPassword = password.trim();
     if (!trimmedPassword) {
-      setPasswordError('Senha é obrigatória!');
+      setError('');
       return false;
     }
 
-    const passwordRegex = /^(?=.*[A-Z])(?=.*[a-z])(?=.*[\W_]).{8,}$/;
-
-    if (!passwordRegex.test(trimmedPassword)) {
-      setPasswordError('Sua senha deve conter pelo menos uma letra maiúscula, uma letra minúscula, um caractere especial e ter pelo menos 8 caracteres!');
-      return false;
-    }
-
-    setPasswordError('');
+    setError('');
     return true;
   };
 
-  const handleCnpjChange = (text: string) => {
-    const formattedCnpj = formatCnpj(text);
-    setCnpj(formattedCnpj);
+  const handleEmailChange = (text: string) => {
+    setEmail(text);
   };
 
   const handlePasswordChange = (text: string) => {
     setPassword(text);
   };
 
-  useEffect(() => {
-    if (cnpjError) {
-      validateCnpj(cnpj);
-    }
-  }, [cnpj, cnpjError]);
-
-  useEffect(() => {
-    if (passwordError) {
-      validatePassword(password);
-    }
-  }, [password, passwordError]);
-
   const renderErrorText = (error: string | null, isCnpjError: boolean = false) => {
     const errorStyle = isCnpjError ? styles.errorTextCnpj : null;
     return error ? <Text style={[styles.errorText, errorStyle]}>{error}</Text> : null;
   };
 
+  const navigation = useNavigation<NativeStackNavigationProp<any>>();
+
+  const handleRegisterScreenPress = () => {
+    navigation.navigate('Register');
+  };
+
   return (
     <View style={styles.body}>
       <View style={styles.containerLogo}>
-        <View style={{ width: 130, height: 130, borderRadius: 65, overflow: 'hidden', justifyContent: "center", alignItems: "center" }}>
+        <View style={{ width: 130, height: 130, justifyContent: "center", alignItems: "center" }}>
           <Logo width={130} height={130} />
         </View>
       </View>
       <View style={styles.container}>
         <Text style={styles.headerText}>Login</Text>
-        <Text style={[styles.labelInput, styles.mt40]}>CNPJ</Text>
-        <View style={[styles.containerInput, cnpjError ? styles.errorInput : null]}>
-          <Buildings size={25} color="black" weight="fill" style={styles.ml5} />
+
+        {/* EMAIL */}
+        <Text style={[styles.labelInput, styles.mt10]}>E-MAIL</Text>
+        <View style={[styles.containerInput, error ? styles.errorInput : null]}>
+          <EnvelopeSimple size={25} color="black" weight="fill" style={styles.ml5} />
           <TextInput
             style={styles.input}
-            keyboardType="numeric"
-            value={cnpj}
-            onChangeText={handleCnpjChange}
+            value={email}
+            onChangeText={handleEmailChange}
           />
         </View>
-        {renderErrorText(cnpjError, true)}
-        <Text style={styles.labelInput}>Senha</Text>
-        <View style={[styles.containerInput, passwordError ? styles.errorInput : null]}>
-          <Key size={25} color="black" weight="fill" style={styles.ml5} />
+
+        {/* SENHA */}
+        <Text style={[styles.labelInput, styles.mt10]}>SENHA</Text>
+        <View style={[styles.containerInput, error ? styles.errorInput : null]}>
+          <LockKey size={25} color="black" weight="fill" style={styles.ml5} />
           <TextInput
             style={styles.input}
             value={password}
@@ -140,17 +116,25 @@ export function Login() {
             )}
           </TouchableOpacity>
         </View>
-        {renderErrorText(passwordError)}
+
+        {/* ERROR */}
+        {renderErrorText(error)}
+        
+        {/* Button - Entrar */}
         <TouchableOpacity style={[styles.button, styles.mt40]} onPress={handleLoginPress}>
           <Text style={styles.buttonText}>Entrar</Text>
         </TouchableOpacity>
+
         <TouchableOpacity>
           <Text style={[styles.containerText, styles.mt50, styles.textAlignCenter]}>Esqueceu sua senha?</Text>
         </TouchableOpacity>
-        <TouchableOpacity>
+
+        <TouchableOpacity onPress={handleRegisterScreenPress}>
           <Text style={[styles.containerText, styles.mt10, styles.textAlignCenter]}>Cadastre-se</Text>
         </TouchableOpacity>
       </View>
     </View>
   )
 }
+
+export default Login;

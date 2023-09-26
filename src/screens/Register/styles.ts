@@ -7,6 +7,9 @@ export const styles = StyleSheet.create({
   mt40: {
     marginTop: 40
   },
+  mt20: {
+    marginTop: 20
+  },
   mt10: {
     marginTop: 10
   },
@@ -22,34 +25,37 @@ export const styles = StyleSheet.create({
   pl15: {
     paddingLeft: 15
   },
+  textUndeline: {
+    textDecorationLine: 'underline'
+  },
   textAlignCenter: {
     textAlign: 'center'
   },
-  body: {
+  container: {
     flex: 1,
-    backgroundColor: '#111111',
-    justifyContent: 'space-between',
+    flexDirection: 'column',
+    position: 'relative',
+    backgroundColor: '#111111'
   },
-  containerLogo: {
-    height: '40%',
+  topContainer: {
+    flex: 2,
+    backgroundColor: '#111111'
+  },
+  containerImage: {
+    position: 'absolute',
+    top: '15%',
+    height: 'auto',
+    width: '100%',
+    zIndex: 1,
     justifyContent: 'center',
     alignItems: 'center'
   },
-  logo: {
-    zIndex: 2,
-    width: 130,
-    height: 130,
-    borderRadius: 100,
-  },
-  bgContainer: {
-    position: 'absolute'
-  },
-  container: {
-    padding: 25,
-    height: '60%',
+  bottomContainer: {
+    flex: 8,
     backgroundColor: '#fff',
-    borderTopRightRadius: 90,
-    borderTopLeftRadius: 7,
+    padding: 25,
+    borderTopLeftRadius: 90,
+    borderTopRightRadius: 7,
     paddingHorizontal: 70
   },
   headerText: {
@@ -96,11 +102,11 @@ export const styles = StyleSheet.create({
     textAlign: 'center'
   },
   containerText: {
-    marginLeft: 10,
     fontSize: 18,
     fontWeight: '400',
     color: '#8F8E8E',
-    letterSpacing: 1
+    letterSpacing: 1,
+    textDecorationLine: 'underline'
   },
   errorInput: {
     borderWidth: 2,
@@ -110,7 +116,4 @@ export const styles = StyleSheet.create({
     marginLeft: 10,
     color: 'red'
   },
-  errorTextCnpj: {
-    marginBottom: 10
-  }
 });
