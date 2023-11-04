@@ -1,19 +1,61 @@
 import { Text, TextInput, TouchableOpacity, View, Alert } from "react-native";
 import { styles } from "./styles";
-import { EnvelopeSimple, Eye, EyeClosed, LockKey, User } from 'phosphor-react-native';
+import { globalStyles } from "../../css/globalStyles";
+import { signInUpStyles } from "../../css/signInUpStyles";
+import { EnvelopeSimple, Eye, EyeClosed, LockKey, User, ArrowSquareLeft } from 'phosphor-react-native';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import React, { useEffect, useState } from "react";
 import Logo from '../../../assets/images/logo.svg';
+import ComboBox, { Option } from '../../components/ComboBox';
+import { api } from "../../services/api";
 
 export function Register() {
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
   const [name, setName] = useState<string>('');
+  const [company, setCompany] = useState<Option>({ label: null, value: null });
   const [showPassword, setShowPassword] = useState(false);
   const [emailError, setEmailError] = useState<string>('');
   const [passwordError, setPasswordError] = useState<string>('');
   const [nameError, setNameError] = useState<string>('');
+  const [companyError, setCompanyError] = useState<string>('');
+
+  const [comboBoxOptions, setComboBoxOptions] = useState<Option[]>([]);
+
+  const fetchOptions = async (): Promise<Option[]> => {
+    try {
+      const response = await api.get('/getCompanies');
+
+      const options: Option[] = response.data.map((item: any) => ({
+        label: item.nameCompany,
+        value: item.idCompany,
+      }));
+
+      return options;
+    } catch (error) {
+      console.error('Erro ao buscar empresas:', error);
+      throw error;
+    }
+  };
+
+  useEffect(() => {
+    const loadComboBoxOptions = async () => {
+      try {
+        const options = await fetchOptions();
+        setComboBoxOptions(options);
+      } catch (error) {
+        console.error('Erro ao carregar opções:', error);
+      }
+    };
+
+    loadComboBoxOptions();
+  }, []);
+
+  const handleComboBoxSelect = (selectedOption: Option) => {
+    setCompany(selectedOption);
+    console.log(selectedOption);
+  };
 
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
@@ -23,15 +65,16 @@ export function Register() {
     const nameValid = validateName(name);
     const emailValid = validateEmail(email);
     const passwordValid = validatePassword(password);
+    const companyValid = validateCompany(company);
 
-    if (nameValid && emailValid && passwordValid) {
+    if (nameValid && emailValid && passwordValid && companyValid) {
       Alert.alert('Success');
     }
   };
 
   const validateName = (value: string): boolean => {
     if (!name) {
-      setNameError('Nome/Razão Social é obrigatório!');
+      setNameError('Nome é obrigatório!');
       return false;
     }
 
@@ -75,6 +118,16 @@ export function Register() {
     return true;
   };
 
+  const validateCompany = (value: Option): boolean => {
+    if (company.label === null && company.value === null) {
+      setCompanyError('Empresa é obrigatório!');
+      return false;
+    }
+
+    setCompanyError('');
+    return true;
+  };
+
   const handleNameChange = (text: string) => {
     setName(text);
   };
@@ -105,8 +158,14 @@ export function Register() {
     }
   }, [password, passwordError]);
 
+  useEffect(() => {
+    if (companyError) {
+      validateCompany(company);
+    }
+  }, [company, companyError]);
+
   const renderErrorText = (error: string | null) => {
-    return error ? <Text style={[styles.errorText]}>{error}</Text> : null;
+    return error ? <Text style={[signInUpStyles.errorText, globalStyles.zIndexNeg1]}>{error}</Text> : null;
   };
 
   const navigation = useNavigation<NativeStackNavigationProp<any>>();
@@ -117,19 +176,23 @@ export function Register() {
 
   return (
     <View style={styles.container}>
-      <View style={styles.topContainer}></View>
+      <View style={styles.topContainer}>
+        <TouchableOpacity onPress={handleLoginScreenPress}>
+          <ArrowSquareLeft size={35} color="white" style={{ top: 90, left: 50 }} />
+        </TouchableOpacity>
+      </View>
       <View style={styles.containerImage}>
         <Logo height={80}/>
       </View>
       <View style={styles.bottomContainer}>
-        <Text style={styles.headerText}>Crie uma conta</Text>
+        <Text style={signInUpStyles.headerText}>Crie uma conta</Text>
 
         {/* NOME */}
-        <Text style={[styles.labelInput, styles.mt40]}>NOME/RAZÃO SOCIAL</Text>
-        <View style={[styles.containerInput, nameError ? styles.errorInput : null]}>
-          <User size={25} color="black" weight="fill" style={styles.ml5} />
+        <Text style={[signInUpStyles.labelInput, globalStyles.mt40]}>NOME</Text>
+        <View style={[signInUpStyles.containerInput, nameError ? signInUpStyles.errorInput : null]}>
+          <User size={25} color="black" weight="fill" style={[globalStyles.ml5, globalStyles.opacity60]} />
           <TextInput
-            style={styles.input}
+            style={signInUpStyles.input}
             value={name}
             onChangeText={handleNameChange}
           />
@@ -137,11 +200,11 @@ export function Register() {
         {renderErrorText(nameError)}
 
         {/* EMAIL */}
-        <Text style={[styles.labelInput, styles.mt10]}>E-MAIL</Text>
-        <View style={[styles.containerInput, emailError ? styles.errorInput : null]}>
-          <EnvelopeSimple size={25} color="black" weight="fill" style={styles.ml5} />
+        <Text style={[signInUpStyles.labelInput, globalStyles.mt10]}>E-MAIL</Text>
+        <View style={[signInUpStyles.containerInput, emailError ? signInUpStyles.errorInput : null]}>
+          <EnvelopeSimple size={25} color="black" weight="fill" style={[globalStyles.ml5, globalStyles.opacity60]} />
           <TextInput
-            style={styles.input}
+            style={signInUpStyles.input}
             value={email}
             onChangeText={handleEmailChange}
           />
@@ -149,36 +212,42 @@ export function Register() {
         {renderErrorText(emailError)}
 
         {/* SENHA */}
-        <Text style={[styles.labelInput, styles.mt10]}>SENHA</Text>
-        <View style={[styles.containerInput, passwordError ? styles.errorInput : null]}>
-          <LockKey size={25} color="black" weight="fill" style={styles.ml5} />
+        <Text style={[signInUpStyles.labelInput, globalStyles.mt10]}>SENHA</Text>
+        <View style={[signInUpStyles.containerInput, passwordError ? signInUpStyles.errorInput : null]}>
+          <LockKey size={25} color="black" weight="fill" style={[globalStyles.ml5, globalStyles.opacity60]} />
           <TextInput
-            style={styles.input}
+            style={signInUpStyles.input}
             value={password}
             onChangeText={handlePasswordChange}
             secureTextEntry={!showPassword}
           />
           <TouchableOpacity
-            style={styles.pl15}
+            style={globalStyles.ml15}
             onPress={togglePasswordVisibility} >
             {showPassword ? (
-              <EyeClosed size={25} color="black" weight="bold" />
+              <EyeClosed size={25} color="black" weight="bold" style={globalStyles.opacity60} />
             ) : (
-              <Eye size={25} color="black" weight="bold" />
+              <Eye size={25} color="black" weight="bold" style={globalStyles.opacity60} />
             )}
           </TouchableOpacity>
         </View>
         {renderErrorText(passwordError)}
 
+        <Text style={[signInUpStyles.labelInput, globalStyles.mt10]}>EMPRESA</Text>
+        <View style={[globalStyles.zIndex5, signInUpStyles.containerInput, companyError ? signInUpStyles.errorInput : null, globalStyles.p0]}>
+          <ComboBox options={comboBoxOptions} onSelect={handleComboBoxSelect} />
+        </View>
+        {renderErrorText(companyError)}
+
         {/* Button - Cadastrar */}
-        <TouchableOpacity style={[styles.button, styles.mt40]} onPress={handleLoginPress}>
-          <Text style={styles.buttonText}>Cadastrar</Text>
+        <TouchableOpacity style={[globalStyles.zIndex1, signInUpStyles.button, globalStyles.mt40]} onPress={handleLoginPress}>
+          <Text style={signInUpStyles.buttonText}>Cadastrar</Text>
         </TouchableOpacity>
 
         {/*  */}
-        <Text style={[styles.containerText, styles.mt50, styles.textAlignCenter]}>Já possui uma conta?</Text>
-        <TouchableOpacity onPress={handleLoginScreenPress}>
-          <Text style={[styles.containerText, styles.mt10, styles.textAlignCenter, styles.textUndeline]}>Entre aqui</Text>
+        <Text style={[signInUpStyles.containerText, globalStyles.mt50, globalStyles.textCenter]}>Já possui uma conta?</Text>
+        <TouchableOpacity onPress={handleLoginScreenPress} style={globalStyles.zIndexNeg1}>
+          <Text style={[signInUpStyles.containerText, globalStyles.mt10, globalStyles.textCenter, globalStyles.textUnderline]}>Entre aqui</Text>
         </TouchableOpacity>
       </View>
     </View>
