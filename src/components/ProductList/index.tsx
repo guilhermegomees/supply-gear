@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { View, FlatList, Text, TextInput, StyleSheet, TouchableOpacity, Dimensions } from 'react-native';
 import { styles } from "./styles";
 import { globalStyles } from "../../css/globalStyles";
+import { useNavigation } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
 import ProductCard from './../ProductCard';
 
@@ -17,6 +19,8 @@ interface ProductListProps {
 }
 
 const ProductList: React.FC<ProductListProps> = ({ products }) => {
+    const navigation = useNavigation<NativeStackNavigationProp<any>>();
+
     const windowWidth = Dimensions.get('window').width;
 
     const calculateNumColumns = () => {
@@ -28,22 +32,18 @@ const ProductList: React.FC<ProductListProps> = ({ products }) => {
             <FlatList
                 data={products}
                 numColumns={calculateNumColumns()}
-                renderItem={({ item, index }) => {
-                    //const isEven = index % 2 === 0;
-
-                    // const cardStyle = {
-                    //     paddingHorizontal: 10
-                    //     paddingLeft: !isEven ? 10 : 0,
-                    //     paddingRight: isEven ? 10 : 0
-                    // };
-
+                keyExtractor={(item) => item.id.toString()}
+                renderItem={({ item }) => {
                     return (
                         <View style={globalStyles.px10}>
-                            <ProductCard product={item} />
+                            <TouchableOpacity onPress={() => {
+                                navigation.navigate('Product', { productId: item.id });
+                            }}>
+                                <ProductCard product={item} />
+                            </TouchableOpacity>
                         </View>
                     );
                 }}
-                //keyExtractor={(item) => item.id.toString()}
                 showsVerticalScrollIndicator={false}
                 contentContainerStyle={[{ gap: 20 }, globalStyles.alignItemsCenter, globalStyles.py25]}
             />

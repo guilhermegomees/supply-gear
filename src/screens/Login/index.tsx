@@ -1,3 +1,4 @@
+import React, { useEffect, useState } from "react";
 import { Text, TextInput, TouchableOpacity, View, Alert } from "react-native";
 import { styles } from "./styles";
 import { globalStyles } from "../../css/globalStyles";
@@ -5,29 +6,53 @@ import { signInUpStyles } from "../../css/signInUpStyles";
 import { EnvelopeSimple, Eye, EyeClosed, LockKey } from 'phosphor-react-native';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import React, { useEffect, useState } from "react";
+import { api } from "../../services/api";
+import { useDispatch, useSelector } from 'react-redux';
 import Logo from '../../../assets/images/logo.svg';
+import { loginUser } from '../../actions/userActions';
+
+interface User {
+  idUser: number;
+  nomeUser: string;
+  username: string;
+  password: string;
+  fkIdCompany: number;
+}
 
 export function Login() {
+  const dispatch = useDispatch();
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState<string>('');
 
+  const navigation = useNavigation<NativeStackNavigationProp<any>>();
+
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
   };
 
-  const handleLoginPress = () => {
-    // const emailValid = validateEmail(email);
-    // const passwordValid = validatePassword(password);
+  const handleLoginPress = async () => {
+    const emailValid = validateEmail(email);
+    //const passwordValid = validatePassword(password);
 
-    // if (emailValid && passwordValid) {
-    //   Alert.alert('Success');
-    // } else {
-    //   setError('E-mail ou senha incorretos!');
-    // }
-    navigation.navigate('Home');
+    if (emailValid/* && passwordValid*/) {
+      const response = await api.get<User[]>('/getUsuarios');
+      const user = response.data;
+
+      const matchingUser: any = user.find(
+        (user) => user.username === email && user.password === password
+      );
+
+      if (matchingUser) {
+        dispatch(loginUser(matchingUser.idUser));
+        navigation.navigate('Home');
+      } else {
+        setError('E-mail ou senha incorretos!');
+      }
+    } else {
+      setError('E-mail ou senha incorretos!');
+    }
   };
 
   const validateEmail = (value: string): boolean => {
@@ -71,8 +96,6 @@ export function Login() {
     return error ? <Text style={signInUpStyles.errorText}>{error}</Text> : null;
   };
 
-  const navigation = useNavigation<NativeStackNavigationProp<any>>();
-
   const handleRegisterScreenPress = () => {
     navigation.navigate('Register');
     setError('');
@@ -87,7 +110,6 @@ export function Login() {
       </View>
       <View style={styles.container}>
         <Text style={signInUpStyles.headerText}>Login</Text>
-
         {/* EMAIL */}
         <Text style={[signInUpStyles.labelInput, globalStyles.mt10]}>E-MAIL</Text>
         <View style={[signInUpStyles.containerInput, error ? signInUpStyles.errorInput : null]}>
@@ -122,18 +144,19 @@ export function Login() {
 
         {/* ERROR */}
         {renderErrorText(error)}
-        
+
         {/* Button - Entrar */}
         <TouchableOpacity style={[signInUpStyles.button, globalStyles.mt40]} onPress={handleLoginPress}>
           <Text style={signInUpStyles.buttonText}>Entrar</Text>
         </TouchableOpacity>
 
         {/* <TouchableOpacity>
-          <Text style={[styles.containerText, globalStyles.mt50, globalStyles.textCenter]}>Esqueceu sua senha?</Text>
-        </TouchableOpacity> */}
+        <Text style={[styles.containerText, globalStyles.mt50, globalStyles.textCenter]}>Esqueceu sua senha?</Text>
+      </TouchableOpacity> */}
 
+        <Text style={[signInUpStyles.containerText, globalStyles.mt50, globalStyles.textCenter]}>Ainda não possui uma conta?</Text>
         <TouchableOpacity onPress={handleRegisterScreenPress}>
-          <Text style={[signInUpStyles.containerText, globalStyles.mt50, globalStyles.textCenter]}>Cadastre-se</Text>
+          <Text style={[signInUpStyles.containerText, globalStyles.mt10, globalStyles.textCenter]}>Cadastre-se</Text>
         </TouchableOpacity>
       </View>
     </View>

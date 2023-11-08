@@ -13,6 +13,8 @@ import ProfileScreen from './../Profile';
 import SearchBar from '../../components/SearchBar';
 
 import { api } from "../../services/api";
+import store from '../../store';
+import { Provider, useSelector } from "react-redux";
 
 const Tab = createBottomTabNavigator();
 
@@ -27,7 +29,7 @@ function HomeScreen() {
       const response = await api.get('/getProducts');
 
       const products: [] = response.data.map((item: any) => ({
-        id: item.idProduct,
+        id: item.id,
         name: item.nameProduct,
         price: item.price,
         image: 'empty-product.svg'
@@ -43,7 +45,7 @@ function HomeScreen() {
   useEffect(() => {
     const loadProducts = async () => {
       try {
-        const loadedProducts = await fetchProducts();        
+        const loadedProducts = await fetchProducts();
         setProducts(loadedProducts);
         setFilteredProducts(loadedProducts);
       } catch (error) {
@@ -75,7 +77,9 @@ function HomeScreen() {
           <Text style={styles.noResultsText}>Nenhum resultado encontrado</Text>
         </View>
       ) : (
-        <ProductList products={filteredProducts} />
+        <>
+          <ProductList products={filteredProducts} />
+        </>
       )}
     </>
   );
@@ -133,12 +137,14 @@ function CustomTabBar({ state, descriptors, navigation }: {
 export function Home() {
 
   return (
-    <Tab.Navigator tabBar={props => <CustomTabBar {...props} />}>
-      <Tab.Screen name="HomeScreen" component={HomeScreen} options={{ headerShown: false }} />
-      <Tab.Screen name="Sacola" component={BagScreen} options={{ headerShown: false }} />
-      {/* <Tab.Screen name="Categorias" component={CategoriesScreen} options={{ headerShown: false }} /> */}
-      <Tab.Screen name="Perfil" component={ProfileScreen} options={{ headerShown: false }} />
-    </Tab.Navigator>
+    <Provider store={store}>
+      <Tab.Navigator tabBar={props => <CustomTabBar {...props} />}>
+        <Tab.Screen name="HomeScreen" component={HomeScreen} options={{ headerShown: false }} />
+        <Tab.Screen name="Sacola" component={BagScreen} options={{ headerShown: false }} />
+        {/* <Tab.Screen name="Categorias" component={CategoriesScreen} options={{ headerShown: false }} /> */}
+        <Tab.Screen name="Perfil" component={ProfileScreen} options={{ headerShown: false }} />
+      </Tab.Navigator>
+    </Provider>
   )
 }
 
