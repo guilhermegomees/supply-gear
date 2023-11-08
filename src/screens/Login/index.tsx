@@ -81,8 +81,8 @@ export function Login() {
   return (
     <View style={styles.body}>
       <View style={styles.containerLogo}>
-        <View style={[{ width: 130, height: 130 }, globalStyles.flexCenter]}>
-          <Logo width={130} height={130} />
+        <View style={[{ width: 100, height: 100 }, globalStyles.flexCenter]}>
+          <Logo width={100} height={100} />
         </View>
       </View>
       <View style={styles.container}>
@@ -110,7 +110,7 @@ export function Login() {
             secureTextEntry={!showPassword}
           />
           <TouchableOpacity
-            style={globalStyles.ml15}
+            style={globalStyles.ml0}
             onPress={togglePasswordVisibility} >
             {showPassword ? (
               <EyeClosed size={25} color="black" weight="bold" style={globalStyles.opacity60} />

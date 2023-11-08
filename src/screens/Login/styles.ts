@@ -7,9 +7,9 @@ export const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   containerLogo: {
-    height: '40%',
+    height: '30%',
     justifyContent: 'center',
-    alignItems: 'center'
+    alignItems: 'center',
   },
   logo: {
     zIndex: 2,
@@ -22,7 +22,7 @@ export const styles = StyleSheet.create({
   },
   container: {
     padding: 25,
-    height: '60%',
+    height: '70%',
     backgroundColor: '#fff',
     borderTopRightRadius: 90,
     borderTopLeftRadius: 7,
