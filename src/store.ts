@@ -5,4 +5,6 @@ const store = configureStore({
   reducer: rootReducer,
 });
 
+export const isUserLoggedIn = (state : any) => state.userId !== null;
+
 export default store;

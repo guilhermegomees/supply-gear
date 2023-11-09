@@ -140,6 +140,15 @@ export const globalStyles = StyleSheet.create({
   mt50: {
     marginTop: 50,
   },
+  mt55: {
+    marginTop: 55,
+  },
+  mt60: {
+    marginTop: 60,
+  },
+  mt65: {
+    marginTop: 65,
+  },
   mt70: {
     marginTop: 70,
   },

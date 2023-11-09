@@ -66,7 +66,7 @@ export function Product({ route }: any) {
     }
   };
 
-  const handleLoginScreenPress = () => {
+  const handleHomeScreenPress = () => {
     navigation.navigate('Home');
   };
 
@@ -86,8 +86,8 @@ export function Product({ route }: any) {
       <ScrollView contentContainerStyle={styles.scrollContainer}>
         <View style={styles.container}>
           <View style={[styles.topContainer]}>
-            <View style={[globalStyles.w100, globalStyles.mt20, globalStyles.flexRow, globalStyles.flexSpaceBetween]}>
-              <TouchableOpacity style={globalStyles.ml30} onPress={handleLoginScreenPress}>
+            <View style={[globalStyles.w100, globalStyles.mt30, globalStyles.flexRow, globalStyles.flexSpaceBetween]}>
+              <TouchableOpacity style={globalStyles.ml30} onPress={handleHomeScreenPress}>
                 <ArrowSquareLeft size={35} color="white" />
               </TouchableOpacity>
               <Logo height={35} />

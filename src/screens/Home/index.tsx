@@ -1,6 +1,6 @@
 import { styles } from "./styles";
 import { globalStyles } from "../../css/globalStyles";
-import { House, Bag, SquaresFour, User, SmileyXEyes } from 'phosphor-react-native';
+import { House, Bag, Package, User, SmileyXEyes } from 'phosphor-react-native';
 import { View, Text, TouchableOpacity, TextInput } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import React, { useEffect, useState } from "react";
@@ -8,7 +8,7 @@ import Logo from '../../../assets/images/logo.svg';
 
 import ProductList from './../../components/ProductList';
 import BagScreen from './../Bag';
-// import CategoriesScreen from './../Categories';
+import OrdersScreen from './../Orders';
 import ProfileScreen from './../Profile';
 import SearchBar from '../../components/SearchBar';
 
@@ -121,10 +121,10 @@ function CustomTabBar({ state, descriptors, navigation }: {
             style={globalStyles.p10}
           >
             <View style={globalStyles.alignItemsCenter}>
-              {route.name === 'HomeScreen' && <House color={isFocused ? '#fff' : '#898989'} size={25} weight="bold" />}
-              {route.name === 'Sacola' && <Bag color={isFocused ? '#fff' : '#898989'} size={25} weight="bold" />}
-              {/* {route.name === 'Categorias' && <SquaresFour color={isFocused ? '#fff' : '#898989'} size={25} weight="bold" />} */}
-              {route.name === 'Perfil' && <User color={isFocused ? '#fff' : '#898989'} size={25} weight="bold" />}
+              {route.name === 'HomeScreen' && <House color={isFocused ? '#fff' : '#898989'} size={25} />}
+              {route.name === 'Sacola' && <Bag color={isFocused ? '#fff' : '#898989'} size={25} />}
+              {route.name === 'Pedidos' && <Package color={isFocused ? '#fff' : '#898989'} size={25} />}
+              {route.name === 'Perfil' && <User color={isFocused ? '#fff' : '#898989'} size={25} />}
               <Text style={[{ color: isFocused ? '#fff' : '#898989' }, globalStyles.textCenter, globalStyles.fontSizeMedium, globalStyles.fontWeight400 ]}>{route.name === 'HomeScreen' ? 'Home' : label}</Text>
             </View>
           </TouchableOpacity>
@@ -141,7 +141,7 @@ export function Home() {
       <Tab.Navigator tabBar={props => <CustomTabBar {...props} />}>
         <Tab.Screen name="HomeScreen" component={HomeScreen} options={{ headerShown: false }} />
         <Tab.Screen name="Sacola" component={BagScreen} options={{ headerShown: false }} />
-        {/* <Tab.Screen name="Categorias" component={CategoriesScreen} options={{ headerShown: false }} /> */}
+        <Tab.Screen name="Pedidos" component={OrdersScreen} options={{ headerShown: false }} />
         <Tab.Screen name="Perfil" component={ProfileScreen} options={{ headerShown: false }} />
       </Tab.Navigator>
     </Provider>
