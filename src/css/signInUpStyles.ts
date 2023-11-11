@@ -38,7 +38,12 @@ export const signInUpStyles = StyleSheet.create({
   },
   errorText: {
     marginLeft: 10,
-    color: 'red'
+    color: 'red',
+    fontSize: 16
+  },
+  successText: {
+    color: 'green',
+    fontSize: 16
   },
   input: {
     color: '#000',

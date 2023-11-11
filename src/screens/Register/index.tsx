@@ -5,7 +5,7 @@ import { signInUpStyles } from "../../css/signInUpStyles";
 import { EnvelopeSimple, Eye, EyeClosed, LockKey, User, ArrowSquareLeft } from 'phosphor-react-native';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import Logo from '../../../assets/images/logo.svg';
 import ComboBox, { Option } from '../../components/ComboBox';
 import { api } from "../../services/api";
@@ -14,14 +14,20 @@ export function Register() {
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
   const [name, setName] = useState<string>('');
-  const [company, setCompany] = useState<Option>({ label: null, value: null });
+  const [company, setCompany] = useState<Option | null>({ label: null, value: null });
   const [showPassword, setShowPassword] = useState(false);
   const [emailError, setEmailError] = useState<string>('');
   const [passwordError, setPasswordError] = useState<string>('');
   const [nameError, setNameError] = useState<string>('');
   const [companyError, setCompanyError] = useState<string>('');
-
+  const [error, setError] = useState<string>('');
+  const [success, setSuccess] = useState<string>('');
+  const [clearSelection, setClearSelection] = useState<boolean>(false);
   const [comboBoxOptions, setComboBoxOptions] = useState<Option[]>([]);
+  
+  const nameRef = useRef<TextInput>(null);
+  const emailRef = useRef<TextInput>(null);
+  const passwordRef = useRef<TextInput>(null);
 
   const fetchOptions = async (): Promise<Option[]> => {
     try {
@@ -54,7 +60,6 @@ export function Register() {
 
   const handleComboBoxSelect = (selectedOption: Option) => {
     setCompany(selectedOption);
-    console.log(selectedOption);
   };
 
   const togglePasswordVisibility = () => {
@@ -73,21 +78,38 @@ export function Register() {
           nomeUser: name,
           username: email,
           password: password,
-          fkIdCompany: company.value, // Supondo que seu endpoint da API espera companyId
+          fkIdCompany: company?.value,
         });
-        console.log(response);
-        // Manipule a resposta, por exemplo, verificando o status da resposta da API
+
+        clearData();
         if (response.status === 200) {
-          Alert.alert('Sucesso', 'Conta criada com sucesso');
+          setSuccess("Conta criada com sucesso!");
         } else {
-          Alert.alert('Erro', 'Falha ao criar conta. Por favor, tente novamente mais tarde.');
+          setError("Falha ao realizar o cadastro. Por favor, tente novamente mais tarde.");
         }
-      } catch (error) {
-        // Trate os erros, por exemplo, mostrando uma mensagem de erro
-        console.error('Erro durante o registro:', error);
-        Alert.alert('Erro', 'Falha ao criar conta. Por favor, tente novamente mais tarde.');
+      } catch (error : any) {
+        // Verificar se o erro é devido a e-mail duplicado
+        if (error.response && error.response.status === 409) {
+          setError("Já existe um cadastro com este e-mail. Por favor, use um e-mail diferente.");
+        } else {
+          setError("Falha ao realizar o cadastro. Por favor, tente novamente mais tarde.");
+        }
       }
     }
+  };
+
+  const clearData = () => {
+    setName('');
+    setEmail('');
+    setPassword('');
+    setClearSelection(true);
+    setTimeout(() => setClearSelection(false), 0);
+
+    [nameRef, emailRef, passwordRef].forEach((ref) => {
+      if (ref.current) {
+        ref.current.blur();
+      }
+    });
   };
 
   const validateName = (value: string): boolean => {
@@ -136,8 +158,8 @@ export function Register() {
     return true;
   };
 
-  const validateCompany = (value: Option): boolean => {
-    if (company.label === null && company.value === null) {
+  const validateCompany = (value: Option | null): boolean => {
+    if (company?.label === null && company?.value === null) {
       setCompanyError('Empresa é obrigatório!');
       return false;
     }
@@ -183,7 +205,15 @@ export function Register() {
   }, [company, companyError]);
 
   const renderErrorText = (error: string | null) => {
-    return error ? <Text style={[signInUpStyles.errorText, globalStyles.zIndexNeg1]}>{error}</Text> : null;
+    return error ? <Text style={[signInUpStyles.errorText, globalStyles.zIndexNeg1, globalStyles.fontWeight700]}>{error}</Text> : null;
+  };
+
+  const renderMessage = (success: string | null, error: string | null) => {
+    if(success) {
+      return <Text style={[signInUpStyles.successText, globalStyles.zIndexNeg1, globalStyles.mt15, globalStyles.textCenter, globalStyles.fontWeight700]}>{success}</Text>
+    } else {
+      return <Text style={[signInUpStyles.errorText, globalStyles.zIndexNeg1, globalStyles.mt15, globalStyles.textCenter, globalStyles.fontWeight700, globalStyles.m0]}>{error}</Text>
+    }
   };
 
   const navigation = useNavigation<NativeStackNavigationProp<any>>();
@@ -213,6 +243,7 @@ export function Register() {
             style={signInUpStyles.input}
             value={name}
             onChangeText={handleNameChange}
+            ref={nameRef}
           />
         </View>
         {renderErrorText(nameError)}
@@ -225,6 +256,7 @@ export function Register() {
             style={signInUpStyles.input}
             value={email}
             onChangeText={handleEmailChange}
+            ref={emailRef}
           />
         </View>
         {renderErrorText(emailError)}
@@ -238,9 +270,10 @@ export function Register() {
             value={password}
             onChangeText={handlePasswordChange}
             secureTextEntry={!showPassword}
+            ref={passwordRef}
           />
           <TouchableOpacity
-            style={globalStyles.mr5}
+            //style={globalStyles.mr5}
             onPress={togglePasswordVisibility} >
             {showPassword ? (
               <EyeClosed size={25} color="black" weight="bold" style={globalStyles.opacity60} />
@@ -253,12 +286,14 @@ export function Register() {
 
         <Text style={[signInUpStyles.labelInput, globalStyles.mt10]}>EMPRESA</Text>
         <View style={[globalStyles.zIndex5, signInUpStyles.containerInput, companyError ? signInUpStyles.errorInput : null, globalStyles.p0]}>
-          <ComboBox options={comboBoxOptions} onSelect={handleComboBoxSelect} />
+          <ComboBox options={comboBoxOptions} onSelect={handleComboBoxSelect} clearSelection={clearSelection} />
         </View>
         {renderErrorText(companyError)}
 
+        {renderMessage(success, error)}
+
         {/* Button - Cadastrar */}
-        <TouchableOpacity style={[globalStyles.zIndex1, signInUpStyles.button, globalStyles.mt40]} onPress={handleLoginPress}>
+        <TouchableOpacity style={[globalStyles.zIndex1, signInUpStyles.button, globalStyles.mt25]} onPress={handleLoginPress}>
           <Text style={signInUpStyles.buttonText}>Cadastrar</Text>
         </TouchableOpacity>
 

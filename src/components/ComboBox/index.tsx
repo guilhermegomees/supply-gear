@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, TouchableOpacity } from 'react-native';
 import { CaretDown, CaretUp, Buildings } from 'phosphor-react-native';
 import { styles } from "./styles";
@@ -12,11 +12,12 @@ export interface Option {
 interface ComboBoxProps {
     options: Option[];
     onSelect: (option: Option) => void;
+    clearSelection: boolean;
     showIcon?: boolean;
     setIcon?: React.ReactNode;
 }
 
-const ComboBox: React.FC<ComboBoxProps> = ({ options, onSelect, showIcon=true, setIcon }) => {
+const ComboBox: React.FC<ComboBoxProps> = ({ options, onSelect, clearSelection, showIcon=true, setIcon }) => {
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const [selectedOption, setSelectedOption] = useState<Option | null>(null);
 
@@ -26,9 +27,15 @@ const ComboBox: React.FC<ComboBoxProps> = ({ options, onSelect, showIcon=true, s
 
     const handleOptionSelect = (option: Option) => {
         setSelectedOption(option);
-        onSelect(option);
+        onSelect(option || { label: null, value: null });
         toggleDropdown();
     };
+
+    useEffect(() => {
+        if (clearSelection) {
+            setSelectedOption(null);
+        }
+    }, [clearSelection]);
 
     return (
         <View style={styles.container}>
@@ -39,7 +46,7 @@ const ComboBox: React.FC<ComboBoxProps> = ({ options, onSelect, showIcon=true, s
                     </View>
                 )}
                 <Text style={styles.selectedOption}>
-                    {selectedOption ? selectedOption.label : ''}
+                    {selectedOption && selectedOption.label !== null && selectedOption.value !== null ? selectedOption.label : ''}
                 </Text>
                 {isDropdownOpen ? (
                     <CaretUp size={20} color="black" weight="bold" />

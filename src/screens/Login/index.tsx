@@ -93,7 +93,7 @@ export function Login() {
   };
 
   const renderErrorText = (error: string | null) => {
-    return error ? <Text style={signInUpStyles.errorText}>{error}</Text> : null;
+    return error ? <Text style={[signInUpStyles.errorText, globalStyles.fontWeight700]}>{error}</Text> : null;
   };
 
   const handleRegisterScreenPress = () => {
@@ -123,7 +123,7 @@ export function Login() {
 
         {/* SENHA */}
         <Text style={[signInUpStyles.labelInput, globalStyles.mt10]}>SENHA</Text>
-        <View style={[signInUpStyles.containerInput, error ? signInUpStyles.errorInput : null]}>
+        <View style={[signInUpStyles.containerInput, error ? signInUpStyles.errorInput : null, globalStyles.pr20]}>
           <LockKey size={25} color="black" weight="fill" style={[globalStyles.ml5, globalStyles.opacity60]} />
           <TextInput
             style={signInUpStyles.input}
@@ -132,7 +132,7 @@ export function Login() {
             secureTextEntry={!showPassword}
           />
           <TouchableOpacity
-            style={globalStyles.ml0}
+            //style={globalStyles.ml0}
             onPress={togglePasswordVisibility} >
             {showPassword ? (
               <EyeClosed size={25} color="black" weight="bold" style={globalStyles.opacity60} />
