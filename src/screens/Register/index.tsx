@@ -61,14 +61,32 @@ export function Register() {
     setShowPassword(!showPassword);
   };
 
-  const handleLoginPress = () => {
+  const handleLoginPress = async () => {
     const nameValid = validateName(name);
     const emailValid = validateEmail(email);
     const passwordValid = validatePassword(password);
     const companyValid = validateCompany(company);
 
     if (nameValid && emailValid && passwordValid && companyValid) {
-      Alert.alert('Success');
+      try {
+        const response = await api.post('/addUsuarios', {
+          nomeUser: name,
+          username: email,
+          password: password,
+          fkIdCompany: company.value, // Supondo que seu endpoint da API espera companyId
+        });
+        console.log(response);
+        // Manipule a resposta, por exemplo, verificando o status da resposta da API
+        if (response.status === 200) {
+          Alert.alert('Sucesso', 'Conta criada com sucesso');
+        } else {
+          Alert.alert('Erro', 'Falha ao criar conta. Por favor, tente novamente mais tarde.');
+        }
+      } catch (error) {
+        // Trate os erros, por exemplo, mostrando uma mensagem de erro
+        console.error('Erro durante o registro:', error);
+        Alert.alert('Erro', 'Falha ao criar conta. Por favor, tente novamente mais tarde.');
+      }
     }
   };
 
@@ -213,7 +231,7 @@ export function Register() {
 
         {/* SENHA */}
         <Text style={[signInUpStyles.labelInput, globalStyles.mt10]}>SENHA</Text>
-        <View style={[signInUpStyles.containerInput, passwordError ? signInUpStyles.errorInput : null]}>
+        <View style={[signInUpStyles.containerInput, passwordError ? signInUpStyles.errorInput : null, globalStyles.pr20]}>
           <LockKey size={25} color="black" weight="fill" style={[globalStyles.ml5, globalStyles.opacity60]} />
           <TextInput
             style={signInUpStyles.input}
@@ -222,7 +240,7 @@ export function Register() {
             secureTextEntry={!showPassword}
           />
           <TouchableOpacity
-            style={globalStyles.ml15}
+            style={globalStyles.mr5}
             onPress={togglePasswordVisibility} >
             {showPassword ? (
               <EyeClosed size={25} color="black" weight="bold" style={globalStyles.opacity60} />
