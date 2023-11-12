@@ -30,5 +30,16 @@ export const styles = StyleSheet.create({
     width: 90,
     height: 90,
     borderRadius: 15
-  }
+  },
+  noResultsContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  noResultsText: {
+    marginTop: 10,
+    fontSize: 20,
+    color: '#999',
+    textAlign: "center"
+  },
 });

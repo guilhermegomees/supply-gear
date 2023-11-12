@@ -4,7 +4,7 @@ import { globalStyles } from "../../css/globalStyles";
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import React, { useEffect, useState } from "react";
-import { ArrowSquareLeft } from "phosphor-react-native";
+import { ArrowSquareLeft, XCircle } from "phosphor-react-native";
 import { useSelector } from "react-redux";
 import { api } from "../../services/api";
 
@@ -117,29 +117,26 @@ const OrderList: React.FC<OrderListProps> = ({ orders }) => {
   const completedOrders = orders.filter(order => order.status === 'Completed');
 
   return (
-    <>
-      {completedOrders.length === 0 ? (
-        <Text>Nenhum Pedido Realizado</Text>
-      ) : (
-        <FlatList
-          data={completedOrders}
-          keyExtractor={(item) => item.idCart.toString()}
-          renderItem={({ item }) => <OrderItem order={item} />}
-        />
-      )}
-    </>
+    <FlatList
+      data={completedOrders}
+      keyExtractor={(item) => item.idCart.toString()}
+      renderItem={({ item }) => <OrderItem order={item} />}
+    />
   );
 };
 
 
 export function Orders() {
   const navigation = useNavigation<NativeStackNavigationProp<any>>();
-  const handleHomeScreenPress = () => {
-    navigation.navigate('Home');
-  };
-
   const userId = useSelector((state: any) => state.userId);
+
   const [orders, setOrders] = useState<Cart[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [noOrdersFound, setNoOrdersFound] = useState<boolean>(false);
+
+  const handleHomeScreenPress = () => {
+    navigation.navigate("Home");
+  };
 
   const fetchOrders = async (): Promise<void> => {
     try {
@@ -153,9 +150,15 @@ export function Orders() {
       const carts = response.data;
 
       setOrders(carts);
-    } catch (error) {
-      console.error(`Erro ao buscar carrinhos com id do usuário: ${userId}`, error);
-      throw error;
+    } catch (error : any) {
+      if (error.response && error.response.status === 404) {
+        setNoOrdersFound(true);
+      } else {
+        console.error(`Erro ao buscar carrinhos com id do usuário: ${userId}`, error);
+        throw error;
+      }
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -163,14 +166,26 @@ export function Orders() {
     fetchOrders();
   }, []);
 
+  const noOrdersMessage = noOrdersFound && !loading && (
+    <View style={[styles.noResultsContainer, { marginBottom: 100}]}>
+      <XCircle color={'black'} size={80} weight="bold" />
+      <Text style={[styles.noResultsText, globalStyles.px50]}>Parece que está vazio aqui!</Text>
+      <Text style={[styles.noResultsText, globalStyles.px50]}>Descubra nossos produtos e faça seu primeiro pedido agora mesmo.</Text>
+    </View>
+  );
+
   return (
-    <View style={[styles.container]}>
-      <View style={[globalStyles.w100, globalStyles.mt60, globalStyles.flexColumn, globalStyles.justifyContentCenter]}>
+    <View style={[styles.container, globalStyles.h100]}>
+      <View style={[globalStyles.w100, globalStyles.mt60, globalStyles.flexColumn, globalStyles.justifyContentCenter, globalStyles.h100]}>
         <TouchableOpacity style={globalStyles.ml30} onPress={handleHomeScreenPress}>
           <ArrowSquareLeft size={35} color="black" />
         </TouchableOpacity>
-        <Text style={[styles.textOrders, globalStyles.ml35, globalStyles.mt30, globalStyles.mb20]}>Pedidos</Text>
-        <OrderList orders={orders} />
+        {orders.length > 0 
+          ? <Text style={[styles.textOrders, globalStyles.ml35, globalStyles.mt30, globalStyles.mb20]}>Pedidos</Text>
+          : null
+        }
+        {noOrdersMessage}
+        {orders.length > 0 && <OrderList orders={orders} />}
       </View>
     </View>
   )
