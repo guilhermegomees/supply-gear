@@ -12,6 +12,7 @@ import { Product } from '../screens/Product';
 import { Bag } from '../screens/Bag';
 import { Profile } from '../screens/Profile';
 import { Orders } from '../screens/Orders';
+import { OrderDetails } from '../screens/OrderDetails';
 
 const Stack = createStackNavigator();
 
@@ -29,6 +30,7 @@ export function AppRoutes() {
                 <Stack.Screen name="Bag" component={Bag} />
                 <Stack.Screen name="Profile" component={Profile} />
                 <Stack.Screen name="Orders" component={Orders} />
+                <Stack.Screen name="OrderDetails" component={OrderDetails} />
             </Stack.Navigator>
         </NavigationContainer>
     );

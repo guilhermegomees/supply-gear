@@ -647,6 +647,158 @@ export const globalStyles = StyleSheet.create({
     alignItems: 'center',
   },
 
+  // Gaps
+  gap1: {
+    gap: 1
+  },
+  gap2: {
+    gap: 2
+  },
+  gap3: {
+    gap: 3
+  },
+  gap4: {
+    gap: 4
+  },
+  gap5: {
+    gap: 5
+  },
+  gap6: {
+    gap: 6
+  },
+  gap7: {
+    gap: 7
+  },
+  gap8: {
+    gap: 8
+  },
+  gap9: {
+    gap: 9
+  },
+  gap10: {
+    gap: 10
+  },
+  gap11: {
+    gap: 11
+  },
+  gap12: {
+    gap: 12
+  },
+  gap13: {
+    gap: 13
+  },
+  gap14: {
+    gap: 14
+  },
+  gap15: {
+    gap: 15
+  },
+  gap16: {
+    gap: 16
+  },
+  gap17: {
+    gap: 17
+  },
+  gap18: {
+    gap: 18
+  },
+  gap19: {
+    gap: 19
+  },
+  gap20: {
+    gap: 20
+  },
+  gap21: {
+    gap: 21
+  },
+  gap22: {
+    gap: 22
+  },
+  gap23: {
+    gap: 23
+  },
+  gap24: {
+    gap: 24
+  },
+  gap25: {
+    gap: 25
+  },
+  gap26: {
+    gap: 26
+  },
+  gap27: {
+    gap: 27
+  },
+  gap28: {
+    gap: 28
+  },
+  gap29: {
+    gap: 29
+  },
+  gap30: {
+    gap: 30
+  },
+  gap31: {
+    gap: 31
+  },
+  gap32: {
+    gap: 32
+  },
+  gap33: {
+    gap: 33
+  },
+  gap34: {
+    gap: 34
+  },
+  gap35: {
+    gap: 35
+  },
+  gap36: {
+    gap: 36
+  },
+  gap37: {
+    gap: 37
+  },
+  gap38: {
+    gap: 38
+  },
+  gap39: {
+    gap: 39
+  },
+  gap40: {
+    gap: 40
+  },
+  gap41: {
+    gap: 41
+  },
+  gap42: {
+    gap: 42
+  },
+  gap43: {
+    gap: 43
+  },
+  gap44: {
+    gap: 44
+  },
+  gap45: {
+    gap: 45
+  },
+  gap46: {
+    gap: 46
+  },
+  gap47: {
+    gap: 47
+  },
+  gap48: {
+    gap: 48
+  },
+  gap49: {
+    gap: 49
+  },
+  gap50: {
+    gap: 50
+  },
+
   // Flex
   flex0: {
     flex: 0,
