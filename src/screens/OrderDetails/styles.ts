@@ -2,12 +2,28 @@ import { StyleSheet } from "react-native";
 
 export const styles = StyleSheet.create({
   container: {
-    backgroundColor: '#F4F4F4'
+    flex: 1,
+    justifyContent: 'center',
   },
-  textOrders: {
-    color: '#797979',
+  title: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginBottom: 10,
+  },
+  list: {
+    width: '100%',
+  },
+  itemContainer: {
+    marginBottom: 20,
+  },
+  text: {
     fontSize: 18,
-    fontWeight: '400',
-    letterSpacing: 0.20
+    fontWeight: '600',
+    textAlign: "center"
+  },
+  total: {
+    marginTop: 20,
+    fontSize: 20,
+    fontWeight: 'bold',
   },
 });
