@@ -117,13 +117,20 @@ const OrderList: React.FC<OrderListProps> = ({ orders }) => {
   const completedOrders = orders.filter(order => order.status === 'Completed');
 
   return (
-    <FlatList
-      data={completedOrders}
-      keyExtractor={(item) => item.idCart.toString()}
-      renderItem={({ item }) => <OrderItem order={item} />}
-    />
+    <>
+      {completedOrders.length === 0 ? (
+        <Text>Nenhum Pedido Realizado</Text>
+      ) : (
+        <FlatList
+          data={completedOrders}
+          keyExtractor={(item) => item.idCart.toString()}
+          renderItem={({ item }) => <OrderItem order={item} />}
+        />
+      )}
+    </>
   );
 };
+
 
 export function Orders() {
   const navigation = useNavigation<NativeStackNavigationProp<any>>();
@@ -132,7 +139,7 @@ export function Orders() {
   };
 
   const userId = useSelector((state: any) => state.userId);
-  const [orders, setOrders] = useState<Cart[]>([]);  
+  const [orders, setOrders] = useState<Cart[]>([]);
 
   const fetchOrders = async (): Promise<void> => {
     try {
