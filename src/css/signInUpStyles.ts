@@ -70,7 +70,7 @@ export const signInUpStyles = StyleSheet.create({
     letterSpacing: 1
   },
   headerText: {
-    fontSize: 55,
+    fontSize: 45,
     fontWeight: "bold",
     color: '#1c2120',
     marginTop: '12%',

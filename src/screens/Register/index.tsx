@@ -1,4 +1,4 @@
-import { Text, TextInput, TouchableOpacity, View, Alert } from "react-native";
+import { Text, TextInput, TouchableOpacity, View, Alert, ScrollView } from "react-native";
 import { styles } from "./styles";
 import { globalStyles } from "../../css/globalStyles";
 import { signInUpStyles } from "../../css/signInUpStyles";
@@ -223,87 +223,93 @@ export function Register() {
   };
 
   return (
-    <View style={styles.container}>
-      <View style={styles.topContainer}>
-        <TouchableOpacity onPress={handleLoginScreenPress}>
-          <ArrowSquareLeft size={35} color="white" style={{ top: 90, left: 50 }} />
-        </TouchableOpacity>
-      </View>
-      <View style={styles.containerImage}>
-        <Logo height={80}/>
-      </View>
-      <View style={styles.bottomContainer}>
-        <Text style={signInUpStyles.headerText}>Crie uma conta</Text>
-
-        {/* NOME */}
-        <Text style={[signInUpStyles.labelInput, globalStyles.mt40]}>NOME</Text>
-        <View style={[signInUpStyles.containerInput, nameError ? signInUpStyles.errorInput : null]}>
-          <User size={25} color="black" weight="fill" style={[globalStyles.ml5, globalStyles.opacity60]} />
-          <TextInput
-            style={signInUpStyles.input}
-            value={name}
-            onChangeText={handleNameChange}
-            ref={nameRef}
-          />
+    <ScrollView
+      contentContainerStyle={styles.scrollContainer}
+      keyboardShouldPersistTaps="handled"
+      scrollEnabled={false}
+    >
+      <View style={styles.container}>
+        <View style={styles.topContainer}>
+          <TouchableOpacity onPress={handleLoginScreenPress}>
+            <ArrowSquareLeft size={35} color="white" style={[globalStyles.mt60, globalStyles.ml40]} />
+          </TouchableOpacity>
+          <View style={styles.containerImage}>
+            <Logo height={80} />
+          </View>
         </View>
-        {renderErrorText(nameError)}
+        <View style={styles.bottomContainer}>
+          <Text style={[signInUpStyles.headerText, globalStyles.mt10]}>Crie uma conta</Text>
 
-        {/* EMAIL */}
-        <Text style={[signInUpStyles.labelInput, globalStyles.mt10]}>E-MAIL</Text>
-        <View style={[signInUpStyles.containerInput, emailError ? signInUpStyles.errorInput : null]}>
-          <EnvelopeSimple size={25} color="black" weight="fill" style={[globalStyles.ml5, globalStyles.opacity60]} />
-          <TextInput
-            style={signInUpStyles.input}
-            value={email}
-            onChangeText={handleEmailChange}
-            ref={emailRef}
-          />
-        </View>
-        {renderErrorText(emailError)}
+          {/* NOME */}
+          <Text style={[signInUpStyles.labelInput, globalStyles.mt25]}>NOME</Text>
+          <View style={[signInUpStyles.containerInput, nameError ? signInUpStyles.errorInput : null]}>
+            <User size={25} color="black" weight="fill" style={[globalStyles.ml5, globalStyles.opacity60]} />
+            <TextInput
+              style={signInUpStyles.input}
+              value={name}
+              onChangeText={handleNameChange}
+              ref={nameRef}
+            />
+          </View>
+          {renderErrorText(nameError)}
 
-        {/* SENHA */}
-        <Text style={[signInUpStyles.labelInput, globalStyles.mt10]}>SENHA</Text>
-        <View style={[signInUpStyles.containerInput, passwordError ? signInUpStyles.errorInput : null, globalStyles.pr20]}>
-          <LockKey size={25} color="black" weight="fill" style={[globalStyles.ml5, globalStyles.opacity60]} />
-          <TextInput
-            style={signInUpStyles.input}
-            value={password}
-            onChangeText={handlePasswordChange}
-            secureTextEntry={!showPassword}
-            ref={passwordRef}
-          />
-          <TouchableOpacity
-            //style={globalStyles.mr5}
-            onPress={togglePasswordVisibility} >
-            {showPassword ? (
-              <EyeClosed size={25} color="black" weight="bold" style={globalStyles.opacity60} />
-            ) : (
-              <Eye size={25} color="black" weight="bold" style={globalStyles.opacity60} />
-            )}
+          {/* EMAIL */}
+          <Text style={[signInUpStyles.labelInput, globalStyles.mt10]}>E-MAIL</Text>
+          <View style={[signInUpStyles.containerInput, emailError ? signInUpStyles.errorInput : null]}>
+            <EnvelopeSimple size={25} color="black" weight="fill" style={[globalStyles.ml5, globalStyles.opacity60]} />
+            <TextInput
+              style={signInUpStyles.input}
+              value={email}
+              onChangeText={handleEmailChange}
+              ref={emailRef}
+            />
+          </View>
+          {renderErrorText(emailError)}
+
+          {/* SENHA */}
+          <Text style={[signInUpStyles.labelInput, globalStyles.mt10]}>SENHA</Text>
+          <View style={[signInUpStyles.containerInput, passwordError ? signInUpStyles.errorInput : null, globalStyles.pr20]}>
+            <LockKey size={25} color="black" weight="fill" style={[globalStyles.ml5, globalStyles.opacity60]} />
+            <TextInput
+              style={signInUpStyles.input}
+              value={password}
+              onChangeText={handlePasswordChange}
+              secureTextEntry={!showPassword}
+              ref={passwordRef}
+            />
+            <TouchableOpacity
+              //style={globalStyles.mr5}
+              onPress={togglePasswordVisibility} >
+              {showPassword ? (
+                <EyeClosed size={25} color="black" weight="bold" style={globalStyles.opacity60} />
+              ) : (
+                <Eye size={25} color="black" weight="bold" style={globalStyles.opacity60} />
+              )}
+            </TouchableOpacity>
+          </View>
+          {renderErrorText(passwordError)}
+
+          <Text style={[signInUpStyles.labelInput, globalStyles.mt10]}>EMPRESA</Text>
+          <View style={[globalStyles.zIndex5, signInUpStyles.containerInput, companyError ? signInUpStyles.errorInput : null, globalStyles.p0]}>
+            <ComboBox options={comboBoxOptions} onSelect={handleComboBoxSelect} clearSelection={clearSelection} />
+          </View>
+          {renderErrorText(companyError)}
+
+          {renderMessage(success, error)}
+
+          {/* Button - Cadastrar */}
+          <TouchableOpacity style={[globalStyles.zIndex1, signInUpStyles.button, globalStyles.mt10]} onPress={handleLoginPress}>
+            <Text style={signInUpStyles.buttonText}>Cadastrar</Text>
+          </TouchableOpacity>
+
+          {/*  */}
+          <Text style={[signInUpStyles.containerText, globalStyles.mt35, globalStyles.textCenter]}>Já possui uma conta?</Text>
+          <TouchableOpacity onPress={handleLoginScreenPress} style={globalStyles.zIndexNeg1}>
+            <Text style={[signInUpStyles.containerText, globalStyles.mt10, globalStyles.textCenter, globalStyles.textUnderline]}>Entre aqui</Text>
           </TouchableOpacity>
         </View>
-        {renderErrorText(passwordError)}
-
-        <Text style={[signInUpStyles.labelInput, globalStyles.mt10]}>EMPRESA</Text>
-        <View style={[globalStyles.zIndex5, signInUpStyles.containerInput, companyError ? signInUpStyles.errorInput : null, globalStyles.p0]}>
-          <ComboBox options={comboBoxOptions} onSelect={handleComboBoxSelect} clearSelection={clearSelection} />
-        </View>
-        {renderErrorText(companyError)}
-
-        {renderMessage(success, error)}
-
-        {/* Button - Cadastrar */}
-        <TouchableOpacity style={[globalStyles.zIndex1, signInUpStyles.button, globalStyles.mt25]} onPress={handleLoginPress}>
-          <Text style={signInUpStyles.buttonText}>Cadastrar</Text>
-        </TouchableOpacity>
-
-        {/*  */}
-        <Text style={[signInUpStyles.containerText, globalStyles.mt50, globalStyles.textCenter]}>Já possui uma conta?</Text>
-        <TouchableOpacity onPress={handleLoginScreenPress} style={globalStyles.zIndexNeg1}>
-          <Text style={[signInUpStyles.containerText, globalStyles.mt10, globalStyles.textCenter, globalStyles.textUnderline]}>Entre aqui</Text>
-        </TouchableOpacity>
       </View>
-    </View>
+    </ScrollView>
   );
 }
 

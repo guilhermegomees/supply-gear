@@ -4,21 +4,16 @@ export const styles = StyleSheet.create({
   container: {
     flex: 1,
     flexDirection: 'column',
-    position: 'relative',
     backgroundColor: '#111111'
   },
   topContainer: {
-    flex: 2,
-    backgroundColor: '#111111'
+    backgroundColor: '#111111',
+    marginBottom: 20
   },
   containerImage: {
-    position: 'absolute',
-    top: '15%',
-    height: 'auto',
-    width: '100%',
     zIndex: 1,
     justifyContent: 'center',
-    alignItems: 'center'
+    alignItems: 'center',
   },
   bottomContainer: {
     flex: 8,
@@ -27,5 +22,8 @@ export const styles = StyleSheet.create({
     borderTopLeftRadius: 90,
     borderTopRightRadius: 7,
     paddingHorizontal: 70
+  },
+  scrollContainer: {
+    flexGrow: 1,
   },
 });
