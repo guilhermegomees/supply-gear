@@ -24,7 +24,7 @@ export function Product({ route }: any) {
   const { productId } = route.params;
   const [product, setProduct] = useState<Product | null>(null);
   const [products, setProducts] = useState([]);
-  const [selectedQuantity, setSelectedQuantity] = useState<number>(1);
+  const [selectedQuantity, setSelectedQuantity] = useState<number>();
 
   const navigation = useNavigation<NativeStackNavigationProp<any>>();
 

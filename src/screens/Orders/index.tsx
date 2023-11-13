@@ -109,10 +109,6 @@ const OrderItem: React.FC<OrderItemProps> = ({ order }) => {
   );
 };
 
-interface OrderListProps {
-  orders: Cart[];
-}
-
 const OrderList: React.FC<OrderListProps> = ({ orders }) => {
   const completedOrders = orders.filter(order => order.status === 'Completed');
 

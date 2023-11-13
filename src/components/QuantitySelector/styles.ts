@@ -10,6 +10,7 @@ export const styles = StyleSheet.create({
         fontSize: 18,
         marginHorizontal: 5,
         width: 25,
-        textAlign: "center"
+        textAlign: "center",
+        color: '#424242'
     },
 });
