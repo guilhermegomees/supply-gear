@@ -20,14 +20,6 @@ interface Product {
   image: string;
 }
 
-interface Bag {
-  idCart: number;
-  creationDate: string;
-  total: string;
-  status: string;
-  fkIdUser: number;
-}
-
 interface BagItemProps {
   product: Product;
 }
@@ -145,7 +137,7 @@ export function Bag() {
 
   const handlePurchasePress = () => {
     // TODO: Navegar para a tela 'MainPayment', mandando junto o id do carrinho (semelhante a função 'handleOrderPress' na tela 'Orders')
-    return;
+    navigation.navigate('MainPayment');
   }
   
   const handleChechProductsPress = () => {
@@ -189,7 +181,7 @@ export function Bag() {
               </View>
               <View style={[globalStyles.py20, globalStyles.px40, globalStyles.flexRow, globalStyles.flexSpaceBetween]}>
                 <Text style={[styles.textPrice]}>Total</Text>
-                <Text style={[styles.textPrice]}>R$ {calculateTotalPrice(products)} no Pix</Text>
+                <Text style={[styles.textPrice]}>R$ {calculateTotalPrice(products)}</Text>
               </View>
             </>
             :

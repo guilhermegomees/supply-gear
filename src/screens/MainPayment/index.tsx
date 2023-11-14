@@ -10,6 +10,8 @@ import { useSelector } from "react-redux";
 import { api } from "../../services/api";
 
 import ChoosePayment from '../ChoosePayment';
+import BagReview from '../BagReview';
+import Payment from '../Payment';
 
 import ProgressIndicator from '../../components/ProgressIndicator';
 
@@ -24,8 +26,8 @@ export function MainPayment() {
       // Se estiver em uma tela diferente da primeira, voltar para a tela anterior
       handleScreenChange(currentScreen - 1);
     } else {
-      // Se estiver na primeira tela, navegar para a tela 'Home'
-      navigation.navigate('Home');
+      // Se estiver na primeira tela, navegar para a tela 'Bag'
+      navigation.navigate('Bag');
     }
   };
 
@@ -66,20 +68,9 @@ export function MainPayment() {
       case 1:
         return <ChoosePayment onNext={() => handleScreenChange(currentScreen + 1)} />;
       case 2:
-        return (
-          <View style={[globalStyles.flexCenter]}>
-            <Text style={[globalStyles.mt20]}>Visao geral</Text>
-            <TouchableOpacity onPress={() => handleScreenChange(currentScreen + 1)} style={[globalStyles.mt30]}>
-              <Text>Próxima Tela</Text>
-            </TouchableOpacity>
-          </View>
-        );
+        return <BagReview onNext={() => handleScreenChange(currentScreen + 1)} />;
       case 3:
-        return (
-          <View style={[globalStyles.flexCenter]}>
-            <Text style={[globalStyles.mt20]}>Pix</Text>
-          </View>
-        );
+        return <Payment />;
       default:
         return null;
     }
