@@ -79,6 +79,51 @@ export function Product({ route }: any) {
     fetchProducts();
   }, []);
 
+  const [success, setSuccess] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
+
+  const handleaddProduct = async () => {
+    if (!selectedQuantity) {
+      setError("Selecione uma quantidade antes de adicionar ao carrinho.");
+      return;
+    }
+
+    try {
+      // Obter a data atual
+      const currentDate = new Date();
+
+      // Formatando a data no formato desejado (você pode ajustar conforme necessário)
+      const formattedDate = currentDate.toISOString().split('T')[0];
+      const response = await api.post('/addCarts', {
+        fkIdUser: 14,
+        status: 'Processing',
+        creationDate: formattedDate, // Enviar a data formatada para a API
+        total: 11.99
+        //productId: productId,
+        //quantity: selectedQuantity,
+      });
+
+      if (response.status === 200) {
+        setSuccess("Produto adicionado ao carrinho com sucesso!");
+        setError(null);
+      } else {
+        setError("Falha ao adicionar o produto ao carrinho. Por favor, tente novamente mais tarde.");
+        setSuccess(null);
+      }
+    } catch (error: any) {
+      if (error.response && error.response.status === 409) {
+        setError("Produto já existe no carrinho. Por favor, verifique o carrinho.");
+      } else {
+        setError("Falha ao adicionar o produto ao carrinho. Por favor, tente novamente mais tarde.");
+      }
+      setSuccess(null);
+    }
+  };
+
+
+
+
+
   StatusBar.setBarStyle('dark-content');
 
   return (
@@ -113,7 +158,7 @@ export function Product({ route }: any) {
                     onQuantityChange={handleQuantityChange}
                   />
                   {/* Button - Adicionar a sacola */}
-                  <TouchableOpacity style={[styles.buttonBag, globalStyles.flexCenter]}>
+                  <TouchableOpacity style={[styles.buttonBag, globalStyles.flexCenter]} onPress={handleaddProduct}>
                     <Text style={styles.buttonBagText}>Adicionar a sacola</Text>
                   </TouchableOpacity>
                 </View>
