@@ -138,13 +138,13 @@ export function Bag() {
   const calculateTotalPrice = (products: Product[]): string => {
     const totalPrice = products.reduce((sum, product) => sum + product.price, 0);
     const hasCents = totalPrice % 1 !== 0;
-    const formattedTotal = hasCents ? totalPrice.toFixed(2) : `${totalPrice},00`;
+    const formattedTotal = hasCents ? totalPrice.toFixed(2).replace('.', ',') : `${totalPrice},00`;
 
     return formattedTotal;
   };
 
   const handlePurchasePress = () => {
-    // TODO: Navegar para a tela 'Payment' (ainda não criada) mandando junto o id do carrinho (semelhante a função 'handleOrderPress' na tela 'Orders')
+    // TODO: Navegar para a tela 'MainPayment', mandando junto o id do carrinho (semelhante a função 'handleOrderPress' na tela 'Orders')
     return;
   }
   
@@ -199,20 +199,19 @@ export function Bag() {
           }
         </View>
       </View>
-      {products.length > 0
-        ?
+      {products.length > 0 ? (
         <View style={[globalStyles.px35]}>
           <TouchableOpacity style={[styles.buttonPurchase, globalStyles.mt25]} onPress={handlePurchasePress}>
             <Text style={signInUpStyles.buttonText}>Comprar</Text>
           </TouchableOpacity>
         </View>
-        :
+      ) : (
         <View style={[globalStyles.px35]}>
           <TouchableOpacity style={[styles.buttonPurchase, globalStyles.mt25, { backgroundColor: '#005B8E' }]} onPress={handleChechProductsPress}>
             <Text style={signInUpStyles.buttonText}>Conferir produtos</Text>
           </TouchableOpacity>
         </View>
-      }
+      )}
     </>
   )
 }
