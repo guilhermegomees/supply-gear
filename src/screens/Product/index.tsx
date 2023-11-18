@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { ScrollView, StatusBar, Text, TouchableOpacity, View } from "react-native";
+import { ScrollView, StatusBar, Text, TouchableOpacity, View, Image } from "react-native";
 import { styles } from "./styles";
 import { globalStyles } from "../../css/globalStyles";
 import { useNavigation } from "@react-navigation/native";
@@ -11,23 +11,32 @@ import Logo from '../../../assets/images/logo.svg';
 import { signInUpStyles } from "../../css/signInUpStyles";
 import { SafeAreaView } from "react-native-safe-area-context";
 import ProductList from "../../components/ProductList";
+import { useSelector } from "react-redux";
 
+import { fetchImagem } from '../../util';
+import Loading from '../../../assets/loading.svg';
 
 interface Product {
   name: string
   descript: string
   techniqueSheet: string
-  price: string
+  price: number
   quant: number
+  image: string
 }
 
 export function Product({ route }: any) {
   const { productId } = route.params;
   const [product, setProduct] = useState<Product | null>(null);
   const [products, setProducts] = useState([]);
-  const [selectedQuantity, setSelectedQuantity] = useState<number>();
+  const [selectedQuantity, setSelectedQuantity] = useState<number>(1);
+  const userId = useSelector((state: any) => state.userId);
 
   const navigation = useNavigation<NativeStackNavigationProp<any>>();
+
+  const [imagem, setImagem] = useState<string>('');
+  //const [error, setError] = useState<string>('');
+  const [loading, setLoading] = useState<boolean>(true);
 
   const fetchProduct = async (): Promise<any> => {
     try {
@@ -38,34 +47,29 @@ export function Product({ route }: any) {
         name: productData.nameProduct,
         descript: productData.descript,
         techniqueSheet: productData.techniqueSheet,
-        price: productData.price,
+        price: Number(productData.price),
         quant: productData.quantity,
+        image: productData.image
       };
 
       setProduct(productMapped);
+      console.log(productMapped.image)
     } catch (error) {
       console.error(`Erro ao buscar produto com id: ${productId}`, error);
       throw error;
     }
   };
 
-  const fetchProducts = async (): Promise<any> => {
-    try {
-      const response = await api.get(`/getProductsByQuantity/2`);
-
-      const productsData: [] = response.data.map((item: any) => ({
-        id: item.id,
-        name: item.nameProduct,
-        price: item.price,
-        image: 'empty-product.svg'
-      }));
-
-      setProducts(productsData);
-    } catch (error) {
-      console.error('Erro ao buscar produtos:', error);
-      throw error;
+  useEffect(() => {
+    if (product && product.image) {
+      fetchImagem(
+        product.image,
+        (base64: string) => setImagem(base64),
+        (errorMessage: string) => setError(errorMessage),
+        setLoading
+      );
     }
-  };
+  }, [product]);
 
   const handleHomeScreenPress = () => {
     navigation.navigate('Home');
@@ -77,7 +81,6 @@ export function Product({ route }: any) {
 
   useEffect(() => {
     fetchProduct();
-    fetchProducts();
   }, []);
 
   const [error, setError] = useState<string>('');
@@ -86,67 +89,73 @@ export function Product({ route }: any) {
   const handleCartCreation = async () => {
     try {
       // Verificar se já existe um carrinho "Processing" para o usuário
-      const existingCartResponse = await api.get(`/getCarts?status=Processing&fkIdUser=14`);
-  
+      const existingCartResponse = await api.get(`/getCartsByIdUser/${userId}/statusProcessing`);
+
       if (existingCartResponse.data.length > 0) {
         // Se existir um carrinho "Processing", adicione o produto a esse carrinho
         const existingCartId = existingCartResponse.data[0].idCart;
-  
+
         const responseAddToExistingCart = await api.post('/addDetails', {
           fkIdCart: existingCartId,
-          fkIdProduct: productId, // Substitua isso pelo ID do produto que você deseja adicionar
-          quantity: 3, // Substitua isso pela quantidade do produto
-          unityPrice: 10, // Substitua isso pelo preço unitário do produto
-          subTotal: 3 * 10
+          fkIdProduct: productId,
+          quantity: selectedQuantity,
+          unityPrice: product!.price,
+          subTotal: selectedQuantity * product!.price,
         });
-  
+
         if (responseAddToExistingCart.status === 200) {
-          setSuccess("Produto adicionado ao carrinho existente com sucesso!");
+          console.log("Produto adicionado ao carrinho existente com sucesso!");
         } else {
-          setError("Falha ao adicionar o produto ao carrinho existente. Por favor, tente novamente mais tarde.");
-        }
-      } else {
-        // Se não existir um carrinho "Processing", crie um novo carrinho
-        const currentDate = new Date();
-        const formattedDate = currentDate.toISOString().split('T')[0];
-  
-        const responseCreateNewCart = await api.post('/addCarts', {
-          creationDate: formattedDate,
-          total: 11.00,
-          status: 'Processing',
-          fkIdUser: 14,
-        });
-  
-        if (responseCreateNewCart.status === 200) {
-          setSuccess("Carrinho criado com sucesso!");
-  
-          // Adicione o produto ao detailCart do novo carrinho
-          const newCartId = responseCreateNewCart.data.insertId;
-  
-          const responseAddToNewCart = await api.post('/addDetails', {
-            fkIdCart: newCartId,
-            fkIdProduct: productId,
-            quantity: 2,
-            unityPrice: 10,
-            subTotal: 2 * 10
-          });
-  
-          if (responseAddToNewCart.status === 200) {
-            setSuccess("Produto adicionado ao novo carrinho com sucesso!");
-          } else {
-            setError("Falha ao adicionar o produto ao novo carrinho. Por favor, tente novamente mais tarde.");
-          }
-        } else {
-          setError("Falha ao criar o carrinho. Por favor, tente novamente mais tarde.");
+          console.error("Falha ao adicionar o produto ao carrinho existente. Por favor, tente novamente mais tarde.");
         }
       }
     } catch (error) {
-      setError("Falha ao realizar a operação. Por favor, tente novamente mais tarde.");
+      createNewCart();
     }
   };
-  
-  
 
+  const createNewCart = async () => {
+    const currentDate = new Date();
+    const formattedDate = currentDate.toISOString().split('T')[0];
+
+    const responseCreateNewCart = await api.post('/addCarts', {
+      creationDate: formattedDate,
+      total: 0,
+      status: 'Processing',
+      fkIdUser: userId,
+    });
+
+    if (responseCreateNewCart.status === 200) {
+      const newCartId = responseCreateNewCart.data.idCart;
+
+      // Aguardar a criação do carrinho antes de chamar addDetails
+      await addToNewCart(newCartId);
+    } else {
+      console.error("Falha ao criar o carrinho.");
+    }
+  };
+
+  const addToNewCart = async (newCartId : number) => {
+    try {
+      const responseAddToNewCart = await api.post('/addDetails', {
+        fkIdCart: newCartId,
+        fkIdProduct: productId,
+        quantity: selectedQuantity,
+        unityPrice: product!.price,
+        subTotal: selectedQuantity * product!.price,
+      });
+
+      console.log("addDetails criado");
+
+      if (responseAddToNewCart.status === 200) {
+        console.log("Produto adicionado ao novo carrinho com sucesso!");
+      } else {
+        console.error("Falha ao adicionar o produto ao novo carrinho.");
+      }
+    } catch (error) {
+      console.error("Erro ao adicionar o produto ao novo carrinho:", error);
+    }
+  };
 
   StatusBar.setBarStyle('dark-content');
 
@@ -163,7 +172,18 @@ export function Product({ route }: any) {
             </View>
           </View>
           <View style={styles.containerImage}>
-            <View style={{ width: '87%', height: 460, backgroundColor: '#C4C4C4', borderRadius: 20 }}></View>
+            {loading ? (
+              <Loading height={460} width={'87%'} />
+            ) : (
+              <Image
+                source={{ uri: imagem }}
+                style={{
+                  width: '87%',
+                  height: 460,
+                  borderRadius: 15,
+                }}
+              />
+            )}
           </View>
           <View style={[styles.bottomContainer, globalStyles.px40]}>
             {product ? (
