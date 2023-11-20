@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, TouchableOpacity, FlatList } from 'react-native';
+import { View, Text, TouchableOpacity, Image } from 'react-native';
 import globalStyles from '../../css/globalStyles';
 import { styles } from './styles';
 import { signInUpStyles } from '../../css/signInUpStyles';
@@ -10,6 +10,7 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useNavigation } from '@react-navigation/native';
 import { api } from '../../services/api';
 import { useSelector } from 'react-redux';
+import { fetchImage } from '../../util';
 
 interface BagReviewProps {
   products: Product[];
@@ -67,11 +68,26 @@ interface BagListProps {
 }
 
 const ProductItem: React.FC<BagItemProps> = ({ product, cartDetails }) => {
+  const [imagem, setImagem] = useState<string>('');
+  const [error, setError] = useState<string>('');
+  const [loading, setLoading] = useState<boolean>(true);
+
   const quantityFromDetailCart = cartDetails.find((detail) => detail.fkIdProduct === product.id)?.quantity || 1;
 
   const formatPrice = (price: number): string => {
     return price.toString().replace('.', ',');
   };
+
+  useEffect(() => {
+    if (product && product.image) {
+      fetchImage(
+        product.image,
+        (base64: string) => setImagem(base64),
+        (errorMessage: string) => setError(errorMessage),
+        setLoading
+      );
+    }
+  }, [product]);
 
   return (
     <>
@@ -79,7 +95,23 @@ const ProductItem: React.FC<BagItemProps> = ({ product, cartDetails }) => {
         <View key={product.id} style={[globalStyles.dFlex, globalStyles.flexRow, globalStyles.flexSpaceBetween]}>
           <View style={[globalStyles.flexRow, globalStyles.flexSpaceBetween]}>
             <View style={[globalStyles.flexRow, globalStyles.gap17]}>
-              <View style={styles.imgProduct}></View>
+              {loading ? (
+                <View style={[styles.imgProduct, globalStyles.flexCenter]}>
+                  <Image
+                    source={require('../../../assets/loading.gif')}
+                    style={{
+                      width: 50,
+                      height: 50
+                    }}
+                  />
+                </View>
+              ) : (
+                <Image
+                  source={{ uri: imagem }}
+                  style={[styles.imgProduct]}
+                  resizeMode="contain"
+                />
+              )}
               <View>
                 <Text style={[styles.containerOrderText, globalStyles.mt20]}>{product.nameProduct}</Text>
                 <Text style={[styles.containerOrderText, globalStyles.mt5]}>Quantidade: {quantityFromDetailCart}</Text>

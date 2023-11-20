@@ -1,4 +1,4 @@
-import { FlatList, ScrollView, Text, TouchableOpacity, View } from "react-native";
+import { FlatList, ScrollView, Text, TouchableOpacity, View, Image } from "react-native";
 import { styles } from "./styles";
 import { globalStyles } from "../../css/globalStyles";
 import { useNavigation } from '@react-navigation/native';
@@ -9,6 +9,7 @@ import { useSelector } from "react-redux";
 import { api } from "../../services/api";
 import QuantitySelector from "../../components/QuantitySelector";
 import { signInUpStyles } from "../../css/signInUpStyles";
+import { fetchImage } from '../../util';
 
 interface User {
   id: number;
@@ -72,6 +73,10 @@ interface BagListProps {
 }
 
 const ProductItem: React.FC<BagItemProps> = ({ product, onQuantityChange, detailCart, onItemDelete }) => {
+  const [imagem, setImagem] = useState<string>('');
+  const [error, setError] = useState<string>('');
+  const [loading, setLoading] = useState<boolean>(true);
+
   const quantityFromDetailCart = detailCart.find((detail) => detail.fkIdProduct === product.id)?.quantity || 1;
   const idDetailCart = detailCart.find((detail) => detail.fkIdProduct === product.id)?.idDetail;
 
@@ -93,13 +98,40 @@ const ProductItem: React.FC<BagItemProps> = ({ product, onQuantityChange, detail
     }
   };
 
+  useEffect(() => {
+    if (product && product.image) {
+      fetchImage(
+        product.image,
+        (base64: string) => setImagem(base64),
+        (errorMessage: string) => setError(errorMessage),
+        setLoading
+      );
+    }
+  }, [product]);
+
   return (
     <>
       <View style={[styles.containerOrder, globalStyles.pb20, globalStyles.px35]}>
         <View style={[globalStyles.dFlex, globalStyles.pl10, globalStyles.mt20]}>
           <View style={[globalStyles.flexRow, globalStyles.flexSpaceBetween]}>
             <View style={[globalStyles.flexRow, globalStyles.gap17]}>
-              <View style={styles.imgProduct}></View>
+              {loading ? (
+                <View style={[styles.imgProduct, globalStyles.flexCenter]}>
+                  <Image
+                    source={require('../../../assets/loading.gif')}
+                    style={{
+                      width: 70,
+                      height: 70
+                    }}
+                  />
+                </View>
+              ) : (
+                <Image
+                  source={{ uri: imagem }}
+                  style={[styles.imgProduct]}
+                  resizeMode="contain"
+                />
+              )}
               <Text style={[styles.containerOrderText, globalStyles.mt20]}>{product.nameProduct}</Text>
             </View>
             <TouchableOpacity onPress={deleteItemBag}>

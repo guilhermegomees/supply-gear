@@ -56,7 +56,7 @@ export const styles = StyleSheet.create({
     letterSpacing: 0.28
   },
   imgProduct: {
-    backgroundColor: '#F4F4F4',
+    backgroundColor: '#F5F5F5',
     width: 90,
     height: 90,
     borderRadius: 15

@@ -32,7 +32,7 @@ function HomeScreen() {
         id: item.id,
         name: item.nameProduct,
         price: item.price,
-        image: 'empty-product.svg'
+        image: item.image
       }));
 
       return products;

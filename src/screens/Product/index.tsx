@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { ScrollView, StatusBar, Text, TouchableOpacity, View, Image } from "react-native";
+import { ScrollView, StatusBar, Text, TouchableOpacity, View, Image, ActivityIndicator } from "react-native";
 import { styles } from "./styles";
 import { globalStyles } from "../../css/globalStyles";
 import { useNavigation } from "@react-navigation/native";
@@ -12,9 +12,7 @@ import { signInUpStyles } from "../../css/signInUpStyles";
 import { SafeAreaView } from "react-native-safe-area-context";
 import ProductList from "../../components/ProductList";
 import { useSelector } from "react-redux";
-
-import { fetchImagem } from '../../util';
-import Loading from '../../../assets/loading.svg';
+import { fetchImage } from '../../util';
 
 interface Product {
   name: string
@@ -53,7 +51,6 @@ export function Product({ route }: any) {
       };
 
       setProduct(productMapped);
-      console.log(productMapped.image)
     } catch (error) {
       console.error(`Erro ao buscar produto com id: ${productId}`, error);
       throw error;
@@ -62,7 +59,7 @@ export function Product({ route }: any) {
 
   useEffect(() => {
     if (product && product.image) {
-      fetchImagem(
+      fetchImage(
         product.image,
         (base64: string) => setImagem(base64),
         (errorMessage: string) => setError(errorMessage),
@@ -158,6 +155,11 @@ export function Product({ route }: any) {
     }
   };
 
+  const formatPrice = (price: number): string => {
+    const hasCents = price % 1 !== 0;
+    return hasCents ? price.toFixed(2).replace('.', ',') : `${price},00`;
+  };
+
   StatusBar.setBarStyle('dark-content');
 
   return (
@@ -169,12 +171,26 @@ export function Product({ route }: any) {
               <TouchableOpacity style={globalStyles.ml30} onPress={handleHomeScreenPress}>
                 <ArrowSquareLeft size={35} color="white" />
               </TouchableOpacity>
-              <Logo height={35} />
             </View>
           </View>
           <View style={styles.containerImage}>
             {loading ? (
-              <Loading height={460} width={'87%'} />
+              <View style={{
+                height: 460,
+                width: '87%',
+                alignItems: 'center',
+                justifyContent: 'center',
+                backgroundColor: '#FFF',
+                borderRadius: 15,
+              }}>
+                <Image 
+                  source={require('../../../assets/loading.gif')} 
+                  style={{
+                    width: 150,
+                    height: 150
+                  }}
+                />
+              </View>
             ) : (
               <Image
                 source={{ uri: imagem }}
@@ -182,7 +198,9 @@ export function Product({ route }: any) {
                   width: '87%',
                   height: 460,
                   borderRadius: 15,
+                  display: !loading ? 'flex' : 'none',
                 }}
+                resizeMode="contain"
               />
             )}
           </View>
@@ -192,7 +210,7 @@ export function Product({ route }: any) {
                 <View style={[{ marginTop: 440 }, globalStyles.flexCenter]}>
                   <Text style={[styles.nameProduct]}>{product.name}</Text>
                   <View style={[globalStyles.flexRow, globalStyles.alignItemsCenter]} >
-                    <Text style={[styles.dolarSign]}>R$ </Text><Text style={styles.price}>{product.price}</Text>
+                    <Text style={[styles.dolarSign]}>R$ </Text><Text style={styles.price}>{formatPrice(product.price)}</Text>
                   </View>
                 </View>
                 <View style={[globalStyles.flexRow, globalStyles.flexSpaceBetween, globalStyles.mt50]}>

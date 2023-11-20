@@ -1,7 +1,7 @@
 import { api } from "./services/api";
 import { Buffer } from 'buffer';
 
-export const fetchImagem = async (
+export const fetchImage = async (
     imageName: string,
     onSuccess: (base64: string) => void,
     onError: (error: string) => void,
@@ -24,8 +24,7 @@ export const fetchImagem = async (
     }
 };
 
-// import { fetchImagem } from '../../util';
-// import Loading from '../../../assets/loading.svg';
+// import { fetchImage } from '../../util';
 
 // const [imagem, setImagem] = useState<string>('');
 // const [error, setError] = useState<string>('');
@@ -33,7 +32,7 @@ export const fetchImagem = async (
 
 // useEffect(() => {
 //     if (product.image) {
-//         fetchImagem(
+//         fetchImage(
 //             product.image,
 //             (base64: string) => setImagem(base64),
 //             (errorMessage: string) => setError(errorMessage),
@@ -43,15 +42,32 @@ export const fetchImagem = async (
 // }, [product.image]);
 
 // {loading ? (
-//     <Loading height={90} width={90} />
+//     <View style={{
+//         height: 460,
+//         width: '87%',
+//         alignItems: 'center',
+//         justifyContent: 'center',
+//         backgroundColor: '#FFF',
+//         borderRadius: 15,
+//     }}>
+//         <Image 
+//             source={require('../../../assets/loading.gif')} 
+//             style={{
+//                 width: 300,
+//                 height: 300
+//             }}
+//         />
+//     </View>
 // ) : (
 //     <Image
-//         source={{ uri: imagem }}
-//         style={{
-//             width: 90,
-//             height: 90,
-//             borderRadius: 15,
-//         }}
+//     source={{ uri: imagem }}
+//     style={{
+//         width: '87%',
+//         height: 460,
+//         borderRadius: 15,
+//         display: !loading ? 'flex' : 'none',
+//     }}
+//     resizeMode="contain"
 //     />
 // )}
 

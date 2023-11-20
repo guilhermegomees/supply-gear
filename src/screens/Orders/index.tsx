@@ -1,4 +1,4 @@
-import { FlatList, Text, TouchableOpacity, View } from "react-native";
+import { FlatList, Text, TouchableOpacity, View, Image } from "react-native";
 import { styles } from "./styles";
 import { globalStyles } from "../../css/globalStyles";
 import { useNavigation } from '@react-navigation/native';
@@ -7,6 +7,7 @@ import React, { useEffect, useState } from "react";
 import { ArrowSquareLeft, XCircle } from "phosphor-react-native";
 import { useSelector } from "react-redux";
 import { api } from "../../services/api";
+import { fetchImage } from '../../util';
 
 interface Product {
   id: number;
@@ -43,12 +44,51 @@ interface OrderListProps {
   orders: Cart[];
 }
 
+const Product: React.FC<{ product: Product }> = ({ product }) => {
+  const [imagem, setImagem] = useState<string>('');
+  const [error, setError] = useState<string>('');
+  const [loading, setLoading] = useState<boolean>(true);
+
+  useEffect(() => {
+    if (product && product.image) {
+      fetchImage(
+        product.image,
+        (base64: string) => setImagem(base64),
+        (errorMessage: string) => setError(errorMessage),
+        setLoading
+      );
+    }
+  }, [product]);
+
+  return (
+    <View key={product.id} style={[globalStyles.dFlex, globalStyles.flexRow, globalStyles.gap32, globalStyles.pl10, globalStyles.mt20]}>
+      {loading ? (
+        <View style={[styles.imgProduct, globalStyles.flexCenter]}>
+          <Image
+            source={require('../../../assets/loading.gif')}
+            style={{
+              width: 65,
+              height: 65
+            }}
+          />
+        </View>
+      ) : (
+        <Image
+          source={{ uri: imagem }}
+          style={[styles.imgProduct]}
+          resizeMode="contain"
+        />
+      )}
+      <View>
+        <Text style={[styles.containerOrderText, globalStyles.mt20]}>{product.nameProduct}</Text>
+        <Text style={[styles.containerOrderText, globalStyles.mt5]}>Quantidade: {product.quantity}</Text>
+      </View>
+    </View>
+  );
+};
+
 const OrderItem: React.FC<OrderItemProps> = ({ order }) => {
   const navigation = useNavigation<NativeStackNavigationProp<any>>();
-  const handleOrderPress = () => {
-    navigation.navigate("OrderDetails", { orderId: order.idCart });
-  };
-
   const [products, setProducts] = useState<Product[]>([]);
 
   const fetchProducts = async (cartId: number): Promise<void> => {
@@ -90,20 +130,19 @@ const OrderItem: React.FC<OrderItemProps> = ({ order }) => {
     }
   }, [order.idCart]);
 
+  const handleOrderPress = () => {
+    navigation.navigate("OrderDetails", { products });
+  };
+
   return (
     <TouchableOpacity onPress={handleOrderPress}>
       <View style={[styles.containerOrder, globalStyles.py20, globalStyles.px20, globalStyles.mt10]}>
         <Text style={styles.containerOrderTitle}>Pedido {order.idCart}</Text>
-
-        {products.map((product) => (
-          <View key={product.id} style={[globalStyles.dFlex, globalStyles.flexRow, globalStyles.gap32, globalStyles.pl10, globalStyles.mt20]}>
-            <View style={styles.imgProduct}></View>
-            <View>
-              <Text style={[styles.containerOrderText, globalStyles.mt20]}>{product.nameProduct}</Text>
-              <Text style={[styles.containerOrderText, globalStyles.mt5]}>Quantidade: {product.quantity}</Text>
-            </View>
-          </View>
-        ))}
+        <FlatList
+          data={products}
+          keyExtractor={(item) => item.id.toString()}
+          renderItem={({ item }) => <Product product={item} />}
+        />
       </View>
     </TouchableOpacity>
   );

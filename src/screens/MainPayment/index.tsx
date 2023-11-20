@@ -35,7 +35,7 @@ interface CartDetail {
 }
 
 type MainPaymentRouteProp = RouteProp<{
-  MainPayment: { products: Product[]; cartDetails: CartDetail[], cartId: number }; // Adicione `detailCart` aqui
+  MainPayment: { products: Product[]; cartDetails: CartDetail[], cartId: number };
 }, 'MainPayment'>;
 
 export function MainPayment() {

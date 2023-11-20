@@ -26,7 +26,7 @@ export const styles = StyleSheet.create({
   },
   bottomContainer: {
     flex: 8,
-    backgroundColor: '#fff',
+    backgroundColor: '#F5F5F5',
   },
   nameProduct: {
     color: 'black',

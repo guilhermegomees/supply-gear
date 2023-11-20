@@ -6,22 +6,22 @@ export const styles = StyleSheet.create({
         borderColor: '#C4C4C4',
         borderRadius: 10,
         width: 160,
-        height: 210,
+        height: 200,
         alignItems: 'center'
     },
     image: {
         width: 100,
         height: 100,
-        borderRadius: 4,
-        marginVertical: 15,
-        backgroundColor: '#C4C4C4'
+        borderRadius: 15,
+        marginTop: 15,
+        backgroundColor: '#FFF'
     },
     textContainer: {
         flex: 1,
         justifyContent: 'flex-end',
         padding: 16,
         gap: 8,
-        width: '100%'
+        width: '100%',
     },
     name: {
         fontSize: 16,
