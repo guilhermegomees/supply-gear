@@ -10,6 +10,7 @@ import { api } from "../../services/api";
 import { useDispatch, useSelector } from 'react-redux';
 import Logo from '../../../assets/images/logo.svg';
 import { loginUser } from '../../actions/userActions';
+import { Buffer } from 'buffer';
 
 interface User {
   idUser: number;
@@ -32,16 +33,22 @@ export function Login() {
     setShowPassword(!showPassword);
   };
 
+  // Função para codificar uma string para Base64 em Node.js
+  function encodeBase64Node(str: string): string {
+    // Use a classe 'Buffer' para codificar a string para Base64
+    return Buffer.from(str).toString('base64');
+  }
+
   const handleLoginPress = async () => {
     const emailValid = validateEmail(email);
     //const passwordValid = validatePassword(password);
-
+    const criptPassword = encodeBase64Node(password);
     if (emailValid/* && passwordValid*/) {
       const response = await api.get<User[]>('/getUsuarios');
       const user = response.data;
 
       const matchingUser: any = user.find(
-        (user) => user.username === email && user.password === password
+        (user) => user.username === email && user.password === criptPassword
       );
 
       if (matchingUser) {

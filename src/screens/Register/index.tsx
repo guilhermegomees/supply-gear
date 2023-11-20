@@ -9,6 +9,7 @@ import React, { useEffect, useRef, useState } from "react";
 import Logo from '../../../assets/images/logo.svg';
 import ComboBox, { Option } from '../../components/ComboBox';
 import { api } from "../../services/api";
+import { Buffer } from 'buffer';
 
 export function Register() {
   const [email, setEmail] = useState<string>('');
@@ -24,7 +25,7 @@ export function Register() {
   const [success, setSuccess] = useState<string>('');
   const [clearSelection, setClearSelection] = useState<boolean>(false);
   const [comboBoxOptions, setComboBoxOptions] = useState<Option[]>([]);
-  
+
   const nameRef = useRef<TextInput>(null);
   const emailRef = useRef<TextInput>(null);
   const passwordRef = useRef<TextInput>(null);
@@ -66,18 +67,25 @@ export function Register() {
     setShowPassword(!showPassword);
   };
 
+  // Função para codificar uma string para Base64 em Node.js
+  function encodeBase64Node(str: string): string {
+    // Use a classe 'Buffer' para codificar a string para Base64
+    return Buffer.from(str).toString('base64');
+  }
+
   const handleLoginPress = async () => {
     const nameValid = validateName(name);
     const emailValid = validateEmail(email);
     const passwordValid = validatePassword(password);
     const companyValid = validateCompany(company);
+    const criptPassword = encodeBase64Node(password);
 
     if (nameValid && emailValid && passwordValid && companyValid) {
       try {
         const response = await api.post('/addUsuarios', {
           nomeUser: name,
           username: email,
-          password: password,
+          password: criptPassword,
           fkIdCompany: company?.value,
         });
 
@@ -85,14 +93,14 @@ export function Register() {
         if (response.status === 200) {
           setSuccess("Conta criada com sucesso!");
         } else {
-          setError("Falha ao realizar o cadastro. Por favor, tente novamente mais tarde.");
+          setError("Falha ao realizar o cadastro. Por favor, tente novamente mais tarde.1");
         }
-      } catch (error : any) {
+      } catch (error: any) {
         // Verificar se o erro é devido a e-mail duplicado
         if (error.response && error.response.status === 409) {
           setError("Já existe um cadastro com este e-mail. Por favor, use um e-mail diferente.");
         } else {
-          setError("Falha ao realizar o cadastro. Por favor, tente novamente mais tarde.");
+          setError("Falha ao realizar o cadastro. Por favor, tente novamente mais tarde.2");
         }
       }
     }
@@ -209,7 +217,7 @@ export function Register() {
   };
 
   const renderMessage = (success: string | null, error: string | null) => {
-    if(success) {
+    if (success) {
       return <Text style={[signInUpStyles.successText, globalStyles.zIndexNeg1, globalStyles.mt15, globalStyles.textCenter, globalStyles.fontWeight700]}>{success}</Text>
     } else {
       return <Text style={[signInUpStyles.errorText, globalStyles.zIndexNeg1, globalStyles.mt15, globalStyles.textCenter, globalStyles.fontWeight700, globalStyles.m0]}>{error}</Text>
