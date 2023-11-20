@@ -105,6 +105,7 @@ export function Product({ route }: any) {
 
         if (responseAddToExistingCart.status === 200) {
           console.log("Produto adicionado ao carrinho existente com sucesso!");
+          //navigation.navigate('Bag');
         } else {
           console.error("Falha ao adicionar o produto ao carrinho existente. Por favor, tente novamente mais tarde.");
         }

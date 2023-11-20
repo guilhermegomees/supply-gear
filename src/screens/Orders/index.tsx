@@ -110,11 +110,9 @@ const OrderItem: React.FC<OrderItemProps> = ({ order }) => {
 };
 
 const OrderList: React.FC<OrderListProps> = ({ orders }) => {
-  const completedOrders = orders.filter(order => order.status === 'Completed');
-
   return (
     <FlatList
-      data={completedOrders}
+      data={orders}
       keyExtractor={(item) => item.idCart.toString()}
       renderItem={({ item }) => <OrderItem order={item} />}
     />
@@ -136,7 +134,7 @@ export function Orders() {
 
   const fetchOrders = async (): Promise<void> => {
     try {
-      const response = await api.get(`/getCartsByIdUser/${userId}`);
+      const response = await api.get(`/getCartsByIdUser/${userId}/statusCompleted`);
 
       if (!response || !response.data || !Array.isArray(response.data)) {
         console.error(`Resposta da API inválida:`, response);
@@ -150,7 +148,7 @@ export function Orders() {
       if (error.response && error.response.status === 404) {
         setNoOrdersFound(true);
       } else {
-        console.error(`Erro ao buscar carrinhos com id do usuário: ${userId}`, error);
+        console.error(`Falha ao buscar pedidos, erro: `, error);
         throw error;
       }
     } finally {
@@ -172,8 +170,8 @@ export function Orders() {
 
   return (
     <View style={[styles.container, globalStyles.h100]}>
-      <View style={[globalStyles.w100, globalStyles.mt60, globalStyles.flexColumn, globalStyles.justifyContentCenter, globalStyles.h100]}>
-        <TouchableOpacity style={globalStyles.ml30} onPress={handleHomeScreenPress}>
+      <View style={[globalStyles.w100, globalStyles.flexColumn, globalStyles.justifyContentCenter, globalStyles.h100]}>
+        <TouchableOpacity style={[globalStyles.ml30, globalStyles.mt60]} onPress={handleHomeScreenPress}>
           <ArrowSquareLeft size={35} color="black" />
         </TouchableOpacity>
         {orders.length > 0 

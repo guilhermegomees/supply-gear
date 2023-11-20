@@ -12,7 +12,18 @@ import { api } from '../../services/api';
 import { useSelector } from 'react-redux';
 
 interface BagReviewProps {
+  products: Product[];
+  cartDetails: CartDetail[];
   onNext: () => void;
+}
+
+interface CartDetail {
+  idDetail: number;
+  fkIdCart: number;
+  fkIdProduct: number;
+  quantity: number;
+  unityPrice: string;
+  subTotal: string;
 }
 
 interface User {
@@ -47,16 +58,19 @@ interface Product {
 
 interface BagItemProps {
   product: Product;
+  cartDetails: CartDetail[];
 }
 
 interface BagListProps {
   bag: Product[];
+  cartDetails: CartDetail[];
 }
 
-const ProductItem: React.FC<BagItemProps> = ({ product }) => {
+const ProductItem: React.FC<BagItemProps> = ({ product, cartDetails }) => {
+  const quantityFromDetailCart = cartDetails.find((detail) => detail.fkIdProduct === product.id)?.quantity || 1;
+
   const formatPrice = (price: number): string => {
-    const hasCents = price % 1 !== 0;
-    return hasCents ? price.toFixed(2).replace('.', ',') : `${price},00`;
+    return price.toString().replace('.', ',');
   };
 
   return (
@@ -68,7 +82,7 @@ const ProductItem: React.FC<BagItemProps> = ({ product }) => {
               <View style={styles.imgProduct}></View>
               <View>
                 <Text style={[styles.containerOrderText, globalStyles.mt20]}>{product.nameProduct}</Text>
-                <Text style={[styles.containerOrderText, globalStyles.mt5]}>Quantidade: {product.quantity}</Text>
+                <Text style={[styles.containerOrderText, globalStyles.mt5]}>Quantidade: {quantityFromDetailCart}</Text>
               </View>
             </View>
           </View>
@@ -84,17 +98,19 @@ const ProductItem: React.FC<BagItemProps> = ({ product }) => {
   );
 };
 
-const BagList: React.FC<BagListProps> = ({ bag }) => {
+const BagList: React.FC<BagListProps> = ({ bag, cartDetails }) => {
   return (
-    <ScrollView>
-      {bag.map((product) => (
-        <ProductItem key={product.id} product={product} />
-      ))}
-    </ScrollView>
+    <View style={{ maxHeight: 350 }}>
+      <ScrollView showsVerticalScrollIndicator={false}>
+        {bag.map((product) => (
+          <ProductItem key={product.id} product={product} cartDetails={cartDetails} />
+        ))}
+      </ScrollView>
+    </View>
   );
 };
 
-const BagReview: React.FC<BagReviewProps> = ({ onNext }) => {
+const BagReview: React.FC<BagReviewProps> = ({ products, cartDetails, onNext }) => {
   const navigation = useNavigation<NativeStackNavigationProp<any>>();
 
   const userId = useSelector((state: any) => state.userId);
@@ -142,33 +158,17 @@ const BagReview: React.FC<BagReviewProps> = ({ onNext }) => {
     fetchClientAndCompany();
   }, []);
 
-  const products: Product[] = [
-    {
-      id: 1,
-      nameProduct: "Product 1",
-      descript: "Description of Product 1",
-      techniqueSheet: "Technical details of Product 1",
-      price: 19.99,
-      quantity: 10,
-      image: "product1.jpg",
-    },
-    {
-      id: 2,
-      nameProduct: "Product 2",
-      descript: "Description of Product 2",
-      techniqueSheet: "Technical details of Product 2",
-      price: 29.99,
-      quantity: 15,
-      image: "product2.jpg",
-    },
-  ];
-
   const calculateTotalPrice = (products: Product[]): string => {
-    const totalPrice = products.reduce((sum, product) => sum + product.price, 0);
-    const hasCents = totalPrice % 1 !== 0;
-    const formattedTotal = hasCents ? totalPrice.toFixed(2).replace('.', ',') : `${totalPrice},00`;
+    let totalSum = 0;
 
-    return formattedTotal;
+    products.forEach((product) => {
+      const quantityFromDetailCart = cartDetails.find((detail) => detail.fkIdProduct === product.id)?.quantity || 1;
+      const productTotal = quantityFromDetailCart * product.price;
+
+      totalSum += productTotal;
+    });
+
+    return totalSum.toFixed(2).replace('.', ',');
   };
 
   return (
@@ -177,7 +177,7 @@ const BagReview: React.FC<BagReviewProps> = ({ onNext }) => {
       <View style={[styles.sections, globalStyles.px30]}>
         <Text style={[styles.sectionsTitle, globalStyles.mb15]}>Produtos</Text>
         <View>
-          <BagList bag={products} />
+          <BagList bag={products} cartDetails={cartDetails} />
         </View>
       </View>
 

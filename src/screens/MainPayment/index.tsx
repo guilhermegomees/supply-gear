@@ -1,7 +1,7 @@
 import { FlatList, Text, TouchableOpacity, View } from "react-native";
 import { styles } from "./styles";
 import { globalStyles } from "../../css/globalStyles";
-import { useNavigation } from '@react-navigation/native';
+import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import React, { useEffect, useState } from "react";
 import { ArrowSquareLeft, CreditCard, CheckSquareOffset, Wallet, Barcode } from "phosphor-react-native";
@@ -15,7 +15,33 @@ import Payment from '../Payment';
 
 import ProgressIndicator from '../../components/ProgressIndicator';
 
+interface Product {
+  id: number;
+  nameProduct: string;
+  descript: string;
+  techniqueSheet: string;
+  price: number;
+  quantity: number;
+  image: string;
+}
+
+interface CartDetail {
+  idDetail: number;
+  fkIdCart: number;
+  fkIdProduct: number;
+  quantity: number;
+  unityPrice: string;
+  subTotal: string;
+}
+
+type MainPaymentRouteProp = RouteProp<{
+  MainPayment: { products: Product[]; cartDetails: CartDetail[], cartId: number }; // Adicione `detailCart` aqui
+}, 'MainPayment'>;
+
 export function MainPayment() {
+  const route = useRoute<MainPaymentRouteProp>();
+  const { products, cartDetails, cartId } = route.params;
+
   const [currentScreen, setCurrentScreen] = useState<number>(1);
   const [progressStatus, setProgressStatus] = useState<'initial' | 'partial' | 'complete'>('initial');
 
@@ -68,9 +94,9 @@ export function MainPayment() {
       case 1:
         return <ChoosePayment onNext={() => handleScreenChange(currentScreen + 1)} />;
       case 2:
-        return <BagReview onNext={() => handleScreenChange(currentScreen + 1)} />;
+        return <BagReview products={products} cartDetails={cartDetails} onNext={() => handleScreenChange(currentScreen + 1)} />;
       case 3:
-        return <Payment />;
+        return <Payment cartId={cartId} />;
       default:
         return null;
     }
