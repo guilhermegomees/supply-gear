@@ -110,7 +110,7 @@ const ProductItem: React.FC<BagItemProps> = ({ product }) => {
                 />
               )}
               <View>
-                <Text style={[styles.containerOrderText, globalStyles.mt20]}>{product.nameProduct}</Text>
+                <Text style={[styles.containerOrderText, globalStyles.mt20, { width: 170 }]}>{product.nameProduct}</Text>
                 <Text style={[styles.containerOrderText, globalStyles.mt5]}>Quantidade: {product.quantity}</Text>
               </View>
             </View>
@@ -236,7 +236,7 @@ export function OrderDetails () {
 
         {/* Informações de Entrega */}
         <View style={[styles.sections]}>
-          <View style={[globalStyles.px30]}>
+          <View style={[globalStyles.px30, globalStyles.pr40]}>
             <Text style={[styles.sectionsTitle, globalStyles.mb15]}>Endereço de entrega</Text>
             <View style={[globalStyles.w100, globalStyles.flexColumn, globalStyles.px20, globalStyles.pb15, globalStyles.mt5]}>
               <View style={[globalStyles.flexRow]}>

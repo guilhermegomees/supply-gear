@@ -10,6 +10,7 @@ import { api } from "../../services/api";
 import QuantitySelector from "../../components/QuantitySelector";
 import { signInUpStyles } from "../../css/signInUpStyles";
 import { fetchImage } from '../../util';
+import { useFocusEffect } from '@react-navigation/native';
 
 interface User {
   id: number;
@@ -76,9 +77,15 @@ const ProductItem: React.FC<BagItemProps> = ({ product, onQuantityChange, detail
   const [imagem, setImagem] = useState<string>('');
   const [error, setError] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(true);
-
+  
   const quantityFromDetailCart = detailCart.find((detail) => detail.fkIdProduct === product.id)?.quantity || 1;
   const idDetailCart = detailCart.find((detail) => detail.fkIdProduct === product.id)?.idDetail;
+
+  const [initialQuantity, setInitialQuantity] = useState(quantityFromDetailCart);
+
+  useEffect(() => {
+    setInitialQuantity(quantityFromDetailCart);
+  }, [quantityFromDetailCart]);
 
   const handleQuantityChange = (newQuantity: number) => {
     onQuantityChange(product.id, newQuantity, quantityFromDetailCart);
@@ -91,7 +98,6 @@ const ProductItem: React.FC<BagItemProps> = ({ product, onQuantityChange, detail
   const deleteItemBag = async () => {
     try {
       await api.delete(`/deleteDetailCart/${idDetailCart}`);
-      
       onItemDelete();
     } catch (error) {
       console.error("Erro ao excluir item do carrinho:", error);
@@ -111,7 +117,7 @@ const ProductItem: React.FC<BagItemProps> = ({ product, onQuantityChange, detail
 
   return (
     <>
-      <View style={[styles.containerOrder, globalStyles.pb20, globalStyles.px35]}>
+      <View key={product.id} style={[styles.containerOrder, globalStyles.pb20, globalStyles.px35]}>
         <View style={[globalStyles.dFlex, globalStyles.pl10, globalStyles.mt20]}>
           <View style={[globalStyles.flexRow, globalStyles.flexSpaceBetween]}>
             <View style={[globalStyles.flexRow, globalStyles.gap17]}>
@@ -132,7 +138,7 @@ const ProductItem: React.FC<BagItemProps> = ({ product, onQuantityChange, detail
                   resizeMode="contain"
                 />
               )}
-              <Text style={[styles.containerOrderText, globalStyles.mt20]}>{product.nameProduct}</Text>
+              <Text style={[styles.containerOrderText, globalStyles.mt20, {width: 190}]}>{product.nameProduct}</Text>
             </View>
             <TouchableOpacity onPress={deleteItemBag}>
               <Trash size={22} weight="bold" color="#008EDE" style={[globalStyles.mr5]} />
@@ -162,12 +168,27 @@ const ProductItem: React.FC<BagItemProps> = ({ product, onQuantityChange, detail
 };
 
 const BagList: React.FC<BagListProps> = ({ bag, onQuantityChange, detailCart, onItemDelete }) => {
+  const [forceUpdate, setForceUpdate] = useState(0);
+
+  const navigation = useNavigation();
+
+  useEffect(() => {
+    const unsubscribe = navigation.addListener('focus', () => {
+      // A cada vez que a tela é focada, incrementamos a variável de estado para forçar a atualização
+      setForceUpdate(prevState => prevState + 1);
+    });
+
+    return unsubscribe; 
+  }, [navigation]);
+
   return (
     <View style={{ maxHeight: 550 }}>
       <FlatList
+        key={forceUpdate}
         data={bag}
         keyExtractor={(item) => item.id.toString()}
-        renderItem={({ item }) => <ProductItem product={item} onQuantityChange={onQuantityChange} detailCart={detailCart} onItemDelete={onItemDelete} />}
+        extraData={detailCart}
+        renderItem={({ item }) => <ProductItem key={item.id} product={item} onQuantityChange={onQuantityChange} detailCart={detailCart} onItemDelete={onItemDelete} />}
       />
     </View>
   );
@@ -212,7 +233,6 @@ export function Bag() {
 
       // Obtém os detalhes do carrinho usando o cartId
       const cartDetailsResponse = await api.get(`/getDetailsCart/${cartId}`);
-
       if (!cartDetailsResponse || !cartDetailsResponse.data || !Array.isArray(cartDetailsResponse.data)) {
         console.error(`Resposta da API inválida para detalhes do carrinho:`, cartDetailsResponse);
         return;
@@ -241,6 +261,7 @@ export function Bag() {
       setProducts(productsMapped);
     } catch (error : any) {
       if (error.response && error.response.status === 404) {
+        setProducts([]);
         setNoProductsFound(true);
         return;
       } else {
@@ -308,6 +329,13 @@ export function Bag() {
     fetchCompany();
   }, []);
 
+  useFocusEffect(
+    React.useCallback(() => {
+      fetchProducts();
+      fetchCompany();
+    }, [])
+  );
+
   const calculateTotalPrice = (products: Product[]): string => {
     let totalSum = 0;
 
@@ -367,7 +395,6 @@ export function Bag() {
       navigation.navigate('MainPayment', { products, cartDetails, cartId });
     } catch (error) {
       console.error('Erro ao atualizar as quantidades no banco de dados:', error);
-      // Trate o erro conforme necessário
     }
   }
   

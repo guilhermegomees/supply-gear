@@ -113,7 +113,7 @@ const ProductItem: React.FC<BagItemProps> = ({ product, cartDetails }) => {
                 />
               )}
               <View>
-                <Text style={[styles.containerOrderText, globalStyles.mt20]}>{product.nameProduct}</Text>
+                <Text style={[styles.containerOrderText, globalStyles.mt20, {width: 170}]}>{product.nameProduct}</Text>
                 <Text style={[styles.containerOrderText, globalStyles.mt5]}>Quantidade: {quantityFromDetailCart}</Text>
               </View>
             </View>
@@ -215,7 +215,7 @@ const BagReview: React.FC<BagReviewProps> = ({ products, cartDetails, onNext }) 
 
       {/* Informações de Entrega */}
       <View style={[styles.sections]}>
-        <View style={[globalStyles.px30]}>
+        <View style={[globalStyles.px30, globalStyles.pr40]}>
           <Text style={[styles.sectionsTitle, globalStyles.mb15]}>Entrega será feita em</Text>
           <View style={[globalStyles.w100, globalStyles.flexColumn, globalStyles.px20, globalStyles.pb15, globalStyles.mt5]}>
             <View style={[globalStyles.flexRow]}>

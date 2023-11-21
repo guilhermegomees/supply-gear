@@ -8,6 +8,7 @@ import { ArrowSquareLeft, XCircle } from "phosphor-react-native";
 import { useSelector } from "react-redux";
 import { api } from "../../services/api";
 import { fetchImage } from '../../util';
+import { useFocusEffect } from '@react-navigation/native';
 
 interface Product {
   id: number;
@@ -80,7 +81,7 @@ const Product: React.FC<{ product: Product }> = ({ product }) => {
         />
       )}
       <View>
-        <Text style={[styles.containerOrderText, globalStyles.mt20]}>{product.nameProduct}</Text>
+        <Text style={[styles.containerOrderText, globalStyles.mt20, {width: 250}]}>{product.nameProduct}</Text>
         <Text style={[styles.containerOrderText, globalStyles.mt5]}>Quantidade: {product.quantity}</Text>
       </View>
     </View>
@@ -198,6 +199,12 @@ export function Orders() {
   useEffect(() => {
     fetchOrders();
   }, []);
+
+  useFocusEffect(
+    React.useCallback(() => {
+      fetchOrders();
+    }, [])
+  );
 
   const noOrdersMessage = noOrdersFound && !loading && (
     <View style={[styles.noResultsContainer, { marginBottom: 100}]}>

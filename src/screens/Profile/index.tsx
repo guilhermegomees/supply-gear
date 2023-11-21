@@ -9,6 +9,7 @@ import { logoutUser } from '../../actions/userActions';
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { ArrowSquareLeft, Package, SignOut, UserCircle } from "phosphor-react-native";
+import { useFocusEffect } from '@react-navigation/native';
 
 interface User {
   id: number;
@@ -78,6 +79,12 @@ export function Profile() {
     fetchClientAndCompany();
   }, []);
 
+  useFocusEffect(
+    React.useCallback(() => {
+      fetchClientAndCompany();
+    }, [])
+  );
+
   const handleLoginPress = async () => {
     dispatch(logoutUser());
     navigation.navigate('Login');
@@ -114,7 +121,7 @@ export function Profile() {
       </TouchableOpacity>
       <View style={[styles.containerMyCompany, globalStyles.w100, globalStyles.h100, globalStyles.flexColumn, globalStyles.px45]}>
         <Text style={[styles.textMyCompany]}>Minha empresa</Text>
-        <View style={[globalStyles.mt20]}>
+        <View style={[globalStyles.mt20, globalStyles.pr20]}>
           <View style={[globalStyles.flexRow]}>
             <View style={[globalStyles.w40]}>
               <Text style={[styles.titleMyCompany]}>Razão Social</Text>
