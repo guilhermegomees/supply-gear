@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Text, TextInput, TouchableOpacity, View, Alert } from "react-native";
+import { Text, TextInput, TouchableOpacity, View, Alert, ScrollView } from "react-native";
 import { styles } from "./styles";
 import { globalStyles } from "../../css/globalStyles";
 import { signInUpStyles } from "../../css/signInUpStyles";
