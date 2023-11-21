@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, TouchableOpacity } from 'react-native';
+import { View, Text, TouchableOpacity, ScrollView } from 'react-native';
 import { CaretDown, CaretUp, Buildings } from 'phosphor-react-native';
 import { styles } from "./styles";
 import { globalStyles } from "../../css/globalStyles";
@@ -56,18 +56,20 @@ const ComboBox: React.FC<ComboBoxProps> = ({ options, onSelect, clearSelection, 
             </TouchableOpacity>
             {isDropdownOpen && (
                 <View style={styles.dropdownList}>
-                    {options.map((option, index) => (
-                        <TouchableOpacity
-                            key={option.value}
-                            style={styles.dropdownItem}
-                            onPress={() => handleOptionSelect(option)}
-                        >
-                            {index > 0 && ( // Verifica se não é o primeiro item
-                                <View style={styles.divider} />
-                            )}
-                            <Text>{option.label}</Text>
-                        </TouchableOpacity>
-                    ))}
+                    <ScrollView>
+                        {options.map((option, index) => (
+                            <TouchableOpacity
+                                key={option.value}
+                                style={styles.dropdownItem}
+                                onPress={() => handleOptionSelect(option)}
+                            >
+                                {index > 0 && ( // Verifica se não é o primeiro item
+                                    <View style={styles.divider} />
+                                )}
+                                <Text style={{ width: 250 }}>{option.label}</Text>
+                            </TouchableOpacity>
+                        ))}
+                    </ScrollView>
                 </View>
             )}
         </View>

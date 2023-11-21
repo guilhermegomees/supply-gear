@@ -19,7 +19,7 @@ export const styles = StyleSheet.create({
         flex: 1,
         color: '#000',
         paddingLeft: 10,
-        fontSize: 20
+        fontSize: 14
     },
     dropdownList: {
         position: 'absolute',

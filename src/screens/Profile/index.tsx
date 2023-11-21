@@ -165,7 +165,7 @@ export function Profile() {
       </TouchableOpacity>
       <View style={[styles.containerMyCompany, globalStyles.w100, globalStyles.h100, globalStyles.flexColumn, globalStyles.px45]}>
         <Text style={[styles.textMyCompany]}>Minha empresa</Text>
-        <View style={[globalStyles.mt20]}>
+        <View style={[globalStyles.mt20, globalStyles.pr20]}>
           <View style={[globalStyles.flexRow]}>
             <View style={[globalStyles.w40]}>
               <Text style={[styles.titleMyCompany]}>Razão Social</Text>

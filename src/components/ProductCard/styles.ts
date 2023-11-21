@@ -6,7 +6,7 @@ export const styles = StyleSheet.create({
         borderColor: '#C4C4C4',
         borderRadius: 10,
         width: 160,
-        height: 200,
+        height: 240,
         alignItems: 'center'
     },
     image: {

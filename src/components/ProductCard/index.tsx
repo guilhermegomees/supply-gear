@@ -56,7 +56,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, style }) => {
                     resizeMode="contain"
                 />
             )}
-            <View style={styles.textContainer}>
+            <View style={[styles.textContainer]}>
                 <Text style={styles.name}>{product.name}</Text>
                 <Text style={styles.price}>R$ {formatPrice(product.price)}</Text>
             </View>

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { ScrollView, StatusBar, Text, TouchableOpacity, View, Image, ActivityIndicator } from "react-native";
+import { ScrollView, StatusBar, Text, TouchableOpacity, View, Image, Alert } from "react-native";
 import { styles } from "./styles";
 import { globalStyles } from "../../css/globalStyles";
 import { useNavigation } from "@react-navigation/native";
@@ -80,6 +80,15 @@ export function Product({ route }: any) {
     fetchProduct();
   }, []);
 
+  const showAlert = (title: string, description: string) => {
+    Alert.alert(
+      title,
+      description,
+      [{ text: 'Continuar' }],
+      { cancelable: false }
+    );
+  };
+
   const [error, setError] = useState<string>('');
   const [success, setSuccess] = useState<string>('');
 
@@ -89,22 +98,59 @@ export function Product({ route }: any) {
       const existingCartResponse = await api.get(`/getCartsByIdUser/${userId}/statusProcessing`);
 
       if (existingCartResponse.data.length > 0) {
-        // Se existir um carrinho "Processing", adicione o produto a esse carrinho
+        // Se existir um carrinho "Processing", obter todos os detalhes do carrinho
         const existingCartId = existingCartResponse.data[0].idCart;
 
-        const responseAddToExistingCart = await api.post('/addDetails', {
-          fkIdCart: existingCartId,
-          fkIdProduct: productId,
-          quantity: selectedQuantity,
-          unityPrice: product!.price,
-          subTotal: selectedQuantity * product!.price,
-        });
+        try {
+          // Tentar obter todos os detalhes do carrinho
+          const responseCartDetails = await api.get(`/getDetailsCart/${existingCartId}`);
 
-        if (responseAddToExistingCart.status === 200) {
-          console.log("Produto adicionado ao carrinho existente com sucesso!");
-          //navigation.navigate('Bag');
-        } else {
-          console.error("Falha ao adicionar o produto ao carrinho existente. Por favor, tente novamente mais tarde.");
+          // Verificar se o produto já está presente nos detalhes do carrinho
+          const existingProductInCart = responseCartDetails.data.find((detail: { fkIdProduct: number; }) => detail.fkIdProduct === productId);
+          if (existingProductInCart) {
+            // Se o produto já está no carrinho, fazer um update na quantidade
+            const existingDetailId = existingProductInCart.idDetail;
+
+            const responseUpdateQuantity = await api.put(`/updateDetailCart/${existingDetailId}`, {
+              quantity: existingProductInCart.quantity + selectedQuantity,
+            });
+
+            if (responseUpdateQuantity.status === 200) {
+              showAlert("Ótima escolha!", "A quantidade do produto na sua sacola foi atualizada.");
+            } else {
+              showAlert("Ops!", "Algo deu errado ao tentar atualizar a quantidade do produto na sua sacola. Por favor, tente novamente mais tarde.");
+            }
+          } else {
+            // Se o produto não está no carrinho, adicionar um novo registro
+            const responseAddToExistingCart = await api.post('/addDetails', {
+              fkIdCart: existingCartId,
+              fkIdProduct: productId,
+              quantity: selectedQuantity,
+              unityPrice: product!.price,
+              subTotal: selectedQuantity * product!.price,
+            });
+
+            if (responseAddToExistingCart.status === 200) {
+              showAlert("Ótima escolha!", "Seu produto foi adicionado à sacola.");
+            } else {
+              showAlert("Ops!", "Algo deu errado ao tentar adicionar o produto à sua sacola. Por favor, tente novamente mais tarde.");
+            }
+          }
+        } catch (detailsError : any) {
+          const responseAddToExistingCart = await api.post('/addDetails', {
+            fkIdCart: existingCartId,
+            fkIdProduct: productId,
+            quantity: selectedQuantity,
+            unityPrice: product!.price,
+            subTotal: selectedQuantity * product!.price,
+          });
+
+          if (responseAddToExistingCart.status === 200) {
+            showAlert("Ótima escolha!", "Seu produto foi adicionado à sacola.");
+          } else {
+            showAlert("Ops!", "Algo deu errado ao tentar adicionar o produto à sua sacola. Por favor, tente novamente mais tarde.");
+            console.error("Erro ao adicionar o produto à sacola: ", detailsError);
+          }
         }
       }
     } catch (error) {
@@ -129,6 +175,7 @@ export function Product({ route }: any) {
       // Aguardar a criação do carrinho antes de chamar addDetails
       await addToNewCart(newCartId);
     } else {
+      showAlert("Ops!", "Algo deu errado ao tentar adicionar o produto à sua sacola. Por favor, tente novamente mais tarde.");
       console.error("Falha ao criar o carrinho.");
     }
   };
@@ -146,12 +193,13 @@ export function Product({ route }: any) {
       console.log("addDetails criado");
 
       if (responseAddToNewCart.status === 200) {
-        console.log("Produto adicionado ao novo carrinho com sucesso!");
+        showAlert("Ótima escolha!", "Seu produto foi adicionado à sacola.");
       } else {
-        console.error("Falha ao adicionar o produto ao novo carrinho.");
+        showAlert("Ops!", "Algo deu errado ao tentar adicionar o produto à sua sacola. Por favor, tente novamente mais tarde.");
       }
     } catch (error) {
-      console.error("Erro ao adicionar o produto ao novo carrinho:", error);
+      showAlert("Ops!", "Algo deu errado ao tentar adicionar o produto à sua sacola. Por favor, tente novamente mais tarde.");
+      console.error("Erro ao adicionar o produto à sacola: ", error);
     }
   };
 
@@ -208,7 +256,7 @@ export function Product({ route }: any) {
             {product ? (
               <>
                 <View style={[{ marginTop: 440 }, globalStyles.flexCenter]}>
-                  <Text style={[styles.nameProduct]}>{product.name}</Text>
+                  <Text style={[styles.nameProduct, globalStyles.textCenter]}>{product.name}</Text>
                   <View style={[globalStyles.flexRow, globalStyles.alignItemsCenter]} >
                     <Text style={[styles.dolarSign]}>R$ </Text><Text style={styles.price}>{formatPrice(product.price)}</Text>
                   </View>

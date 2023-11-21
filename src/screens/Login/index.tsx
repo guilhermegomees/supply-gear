@@ -53,7 +53,7 @@ export function Login() {
 
       if (matchingUser) {
         dispatch(loginUser(matchingUser.idUser));
-        navigation.navigate('Home');
+        navigation.navigate('MainTabs');
       } else {
         setError('E-mail ou senha incorretos!');
       }
